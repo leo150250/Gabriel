@@ -1,0 +1,80 @@
+[
+    {
+        "nome": "Flauta",
+        "abreviatura": "Flt",
+        "pautas": ["G"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Clarinete Bb",
+        "abreviatura": "ClBb",
+        "pautas": ["G"],
+        "transposicao": 2
+    },
+    {
+        "nome": "Sax Alto",
+        "abreviatura": "SxA",
+        "pautas": ["G"],
+        "transposicao": 3
+    },
+    {
+        "nome": "Sax Tenor",
+        "abreviatura": "SxT",
+        "pautas": ["G"],
+        "transposicao": 2
+    },
+    {
+        "nome": "Sax Barítono",
+        "abreviatura": "SxB",
+        "pautas": ["G"],
+        "transposicao": 3
+    },
+    {
+        "nome": "Trompete Bb",
+        "abreviatura": "TptBb",
+        "pautas": ["G"],
+        "transposicao": 2
+    },
+    {
+        "nome": "Trombone",
+        "abreviatura": "Trb",
+        "pautas": ["F"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Tuba",
+        "abreviatura": "Tb",
+        "pautas": ["F"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Piano",
+        "abreviatura": "Pno",
+        "pautas": ["G", "F"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Violino",
+        "abreviatura": "Vln",
+        "pautas": ["G"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Viola",
+        "abreviatura": "Vla",
+        "pautas": ["C"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Violoncelo",
+        "abreviatura": "Vlc",
+        "pautas": ["F"],
+        "transposicao": 0
+    },
+    {
+        "nome": "Baixo",
+        "abreviatura": "Bx",
+        "pautas": ["F"],
+        "transposicao": 0
+    }
+]

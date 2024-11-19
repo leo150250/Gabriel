@@ -1,0 +1,180 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #CCC;
+    width: 100%;
+    height: 100%;
+}
+
+#toolbar {
+    background-color: #f4f4f4;
+    display: flex;
+    justify-content: space-around;
+    height: 3em;
+    position: absolute;
+    top: 0em;
+    left: 0em;
+    width: 100%;
+}
+
+#toolbar button {
+    padding: 10px;
+    border: none;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#toolbar button:hover {
+    background-color: #ddd;
+}
+
+#instrument-list {
+    margin: 10px;
+    text-align: center;
+}
+
+#partitura {
+    display: flex;
+    background-color: #FFF;
+    &.linear {
+        width: calc(100%);
+        height: calc(100% - 3em);
+	    overflow: scroll;
+        position: absolute;
+        top: 3em;
+        left: 0;
+    }
+    &.pagina {
+        margin: 1em;
+        overflow: hidden;
+        flex-wrap: wrap;
+        width: 210mm;
+        height: 297mm;
+    }
+}
+
+.sistema {
+	
+	display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 0;
+}
+
+.instrumento {
+    margin-bottom: 20px;
+	background-color: #F00;
+	display: flex;
+	padding: 0.5em;
+}
+
+.nome-instrumento {
+    font-weight: bold;
+    margin-bottom: 5px;
+	background-color: #FFF;
+	padding: 0.5em;
+}
+
+.pauta {
+    margin-bottom: 20px;
+	background-color: #FF0;
+	padding: 0.5em;
+	display: flex;
+}
+
+.compasso {
+    display: flex;
+    position: relative;
+    min-width: 10em;
+    z-index: 1;
+    position: relative;
+    background-image: url("imagens/pauta.svg");
+    background-position: center left;
+    background-repeat: repeat-x;
+    align-items: center;
+}
+.compasso .cabecalho {
+    margin-left: -40px;
+    text-align: right;
+    width: 40px;
+    padding-right: 20px;
+    z-index: 2;
+    position: relative;
+    align-content: center;
+}
+.compasso:has(.cabecalho[style*="display: block;"], .cabecalho[style*="display: inline;"]) {
+    margin-left: 60px;
+}
+@media print {
+    .compasso {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+}
+
+.sustenido, .bemol {
+    font-size: 18px;
+    display: inline-block;
+    margin-right: 2px;
+}
+
+.clave {
+    margin: 0px -25px;
+    pointer-events: none;
+}
+
+.barra {
+    margin: 0px -50px;
+    position: absolute;
+    pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+.divisao {
+    min-height: 3px;
+    text-align: center;
+    min-width: 2em;
+    position: relative;
+}
+
+.figura {
+    margin: 0px -30px;
+    vertical-align: middle;
+    position: relative;
+}
+
+.sincopa {
+    position: absolute;
+    height: 100px;
+    margin: -50px 0px;
+    pointer-events: none;
+}
+
+.selecionado {
+    /* background-color: #08f4; */
+    filter: drop-shadow(0px 0px 4px #F00);
+}
+
+.formula {
+    display: flex;
+    flex-direction: column;
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    font-size: 2rem;
+    align-items: flex-start;
+    font-weight: bold;
+    margin: 0px 5px;
+}
+.formula div {
+    margin: -0.3rem 0rem;
+}
+
+.armadura {
+    white-space: nowrap;
+}
+.armadura img {
+    margin: 0px -44px;
+    position: relative;
+}
