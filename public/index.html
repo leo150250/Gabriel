@@ -7,11 +7,22 @@
     <link rel="stylesheet" href="interno/estilo.css">
 </head>
 <body>
-    <div id="toolbar">
-        <button onclick="addNote()">Nota</button>
-        <button onclick="addRest()">Pausa</button>
+    <div id="wrapper">
+        <div id="menuTopo" class="barraMenu topo">
+            <button>≡</button>
+            <hr>
+            <button title="Seleção">S</button>
+            <button title="Seleção de pautas">P</button>
+            <button title="Seleção de compassos">C</button>
+            <hr>
+            <button title="Edição">✏</button>
+        </div>
+        <div id="partitura" class="linear">
+        </div>
+        <div id="menuBase" class="barraMenu base">
+            <button>AAAAA</button>
+        </div>
     </div>
-    <div id="partitura" class="linear"></div>
     <script src="interno/gabriel.js"></script>
 </body>
 </html>

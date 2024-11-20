@@ -7,27 +7,34 @@ body {
     height: 100%;
 }
 
-#toolbar {
-    background-color: #f4f4f4;
+#wrapper {
     display: flex;
-    justify-content: space-around;
-    height: 3em;
-    position: absolute;
-    top: 0em;
-    left: 0em;
-    width: 100%;
+    flex-direction: column;
 }
 
-#toolbar button {
+.barraMenu {
+    background-color: #F4F4F4;
+    display: flex;
+    height: 3em;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0px 0px 8px #0004;
+}
+.barraMenu button {
     padding: 10px;
     border: none;
     background-color: #fff;
     border-radius: 4px;
     cursor: pointer;
+    min-height: 3rem;
+    min-width: 3rem;
+    margin-right: 1px;
 }
-
-#toolbar button:hover {
+.barraMenu button:hover {
     background-color: #ddd;
+}
+.barraMenu hr {
+    margin: 0.5em;
 }
 
 #instrument-list {
@@ -37,14 +44,12 @@ body {
 
 #partitura {
     display: flex;
+    position: relative;
+    flex-grow: 2;
+    flex-basis: 100%;
     background-color: #FFF;
     &.linear {
-        width: calc(100%);
-        height: calc(100% - 3em);
 	    overflow: scroll;
-        position: absolute;
-        top: 3em;
-        left: 0;
     }
     &.pagina {
         margin: 1em;
@@ -56,7 +61,6 @@ body {
 }
 
 .sistema {
-	
 	display: flex;
     flex-direction: column;
     position: relative;
