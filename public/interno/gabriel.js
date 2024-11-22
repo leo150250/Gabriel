@@ -19,6 +19,7 @@ var elementoSelecionado = null;
 
 //#region Enums para tipos de figuras, durações e alturas
 const Duracoes = {
+	BREVE: 8,
 	SEMIBREVE: 4,
 	MINIMA: 2,
 	SEMINIMA: 1,
@@ -59,13 +60,20 @@ const AlturasPx = {
 	ESPACO1: alturaLinhasPautasPx*3,
 	LINHA1: alturaLinhasPautasPx*4
 }
+export default {
+	Duracoes:Duracoes,
+	Alturas:Alturas,
+	Claves:Claves,
+	Barras:Barras,
+	AlturasPx:AlturasPx
+};
 //#endregion
 
 
 
 
 //#region Classes
-class Figura {
+export class Figura {
 	constructor(argDivisao,argFigura,argAltura,argOitava,argPausa = false) {
 		this.divisao = argDivisao;
 		this.figura = argFigura;
@@ -566,10 +574,10 @@ function criarInstrumentoPadrao(tipo) {
     return novoInstrumento;
 }
 
-function renderizarPartitura() {
+export function renderizarPartitura() {
 	console.log("=== RENDERIZANDO PARTITURA");
 	for (let i = 0; i < numCompassos; i++) {
-		novoSistema = new Sistema();
+		let novoSistema = new Sistema();
 		divPartitura.appendChild(novoSistema.el);
 	}
 	if (parteSelecionada==-1) {
@@ -634,6 +642,10 @@ function selecionarElemento(argElemento) {
 		elementoSelecionado.el.classList.add("selecionado");
 	}
 }
+
+function importarModulo(argModulo) {
+	import("./modulos/"+argModulo+".js");
+}
 //#endregion
 
 
@@ -641,13 +653,13 @@ function selecionarElemento(argElemento) {
 
 //#region Event listeners
 document.body.addEventListener("keydown",(e)=>{
-	console.log(e.key);
-	if (e.key == "F5") {
+	console.log(e.code);
+	if (e.code == "F5") {
 		location.reload();
 	}
 	if (elementoSelecionado instanceof Figura) {
 		e.preventDefault();
-		switch (e.key) {
+		switch (e.code) {
 			case "ArrowUp": elementoSelecionado.subirAltura(); break;
 			case "ArrowDown": elementoSelecionado.descerAltura(); break;
 		}
@@ -664,3 +676,4 @@ document.body.addEventListener("keydown",(e)=>{
 
 
 testarPartitura();
+importarModulo("editor");
