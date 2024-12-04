@@ -2,7 +2,6 @@ html {
     width: 100%;
     height: 100%;
 }
-
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -12,13 +11,82 @@ body {
     height: 100%;
     overflow: hidden;
 }
+button {
+    outline: none;
+}
 
+#loader {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: #F8F8F8;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: ease-in-out 0.25s;
+    progress {
+        appearance: none;
+        height: 0.25em;
+        margin: 1em;
+        &::-webkit-progress-bar {
+            background-color: #0001;
+        }
+        &::-webkit-progress-value {
+            background-color: #bbd1ee;
+            border-bottom: #5883bd solid 1px;
+        }
+    }
+}
 #wrapper {
     display: flex;
     flex-direction: column;
     position: relative;
     width: 100%;
     height: 100%;
+    transition: opacity 0.25s ease-in-out
+}
+body:has(> #menuPrincipal[exibir]) #wrapper {
+    opacity: 0.2;
+    pointer-events: none;
+}
+#menuPrincipal {
+    position: fixed;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    top: 0px;
+    left: -15em;
+    width: 15em;
+    height: 100%;
+    background-color: #F8F8F8;
+    box-shadow: 0px 0px 8px #0004;
+    transition: 0.25s ease-in-out;
+}
+#menuPrincipal[exibir] {
+    left: 0em;
+}
+#menuPrincipal button.fixo {
+    position: absolute;
+    right: 0px;
+}
+#menuPrincipal div {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    align-self: stretch;
+}
+#menuPrincipal div button {
+    text-align: left;
+    margin-top: 1px;
+}
+#menuPrincipal img.logo {
+    padding: 1em;
+    background-color: #111;
+    object-fit: scale-down;
 }
 
 .barraMenu {
@@ -28,7 +96,7 @@ body {
     z-index: 100;
     box-shadow: 0px 0px 8px #0004;
 }
-.barraMenu button {
+.barraMenu button, #menuPrincipal button {
     padding: 10px;
     border: none;
     background-color: #fff;
@@ -38,19 +106,21 @@ body {
     min-width: 3rem;
     margin-right: 1px;
 }
-.barraMenu button:hover {
+.barraMenu button:hover, #menuPrincipal button:hover {
     background-color: #EEE;
 }
 .barraMenu button.selecionado {
-    background-color: #CCF;
+    background-color: #bbd1ee;
 }
 .barraMenu hr {
     margin: 0.5em;
 }
 
-#instrument-list {
-    margin: 10px;
-    text-align: center;
+#menuBase > div {
+    display: none;
+}
+#menuBase > div.exibir {
+    display: block;
 }
 
 #partitura {
@@ -71,10 +141,8 @@ body {
 }
 
 .sistema {
-	display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 0;
+	position: relative;
+	z-index: 0;
 }
 
 .instrumento {

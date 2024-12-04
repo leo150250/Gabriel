@@ -7,21 +7,37 @@
     <link rel="stylesheet" href="interno/estilo.css">
 </head>
 <body>
+    <div id="loader">
+        <img alt="Gabriel" src="interno/imagens/logoGabriel.gif">
+        <progress id="loaderBarra" max="100"></progress>
+        <p id="loaderTexto">Carregando...</p>
+    </div>
+    <div id="menuPrincipal">
+        <img alt="Gabriel" class="logo" src="interno/imagens/logoGabriel_full.png">
+        <button class="fixo" onclick="exibirMenuPrincipal()">X</button>
+        <div>
+            <button>Botão 1</button>
+            <button>Botão 2</button>
+            <button>Botão 3</button>
+            <button>Botão 4</button>
+            <button>Botão 5</button>
+            <button>Botão 6</button>
+        </div>
+    </div>
     <div id="wrapper">
         <div id="menuTopo" class="barraMenu topo">
-            <button>≡</button>
+            <button onclick="exibirMenuPrincipal()">≡</button>
             <hr>
             <button title="Seleção">S</button>
             <button title="Seleção de pautas">P</button>
             <button title="Seleção de compassos">C</button>
             <hr>
-            <button title="Edição">✏</button>
         </div>
         <div id="partitura" class="linear">
         </div>
         <div id="menuBase" class="barraMenu base">
         </div>
     </div>
-    <script type="module" src="interno/gabriel.js"></script>
+    <script src="interno/gabriel.js"></script>
 </body>
 </html>

@@ -1,5 +1,9 @@
 //#region Constantes e variáveis
 const divPartitura = document.getElementById("partitura");
+const divMenuTopo = document.getElementById("menuTopo");
+const divMenuBase = document.getElementById("menuBase");
+const divLoader = document.getElementById("loader");
+const divMenuPrincipal = document.getElementById("menuPrincipal");
 const alturaCompassosPx = 150;
 const alturaLinhasPautasPx = 6;
 const alturaLinhasOitavasPx = alturaLinhasPautasPx*7;
@@ -12,6 +16,8 @@ var numCompassos = 32;
 var andamento = [4,4];
 var tom = 0;
 var elementoSelecionado = null;
+var menus = [];
+var indiceCarregamento = 1;
 //#endregion
 
 
@@ -60,20 +66,41 @@ const AlturasPx = {
 	ESPACO1: alturaLinhasPautasPx*3,
 	LINHA1: alturaLinhasPautasPx*4
 }
-export default {
-	Duracoes:Duracoes,
-	Alturas:Alturas,
-	Claves:Claves,
-	Barras:Barras,
-	AlturasPx:AlturasPx
-};
 //#endregion
 
 
 
 
 //#region Classes
-export class Figura {
+class Menu {
+	constructor(argNome,argTextoBotao,argElementoMenu) {
+		this.selecionado = false;
+		this.elementoMenu = argElementoMenu;
+		this.botao = document.createElement("button");
+		this.botao.innerHTML = argTextoBotao;
+		this.botao.title = argNome;
+		this.botao.onclick = ()=>{
+			exibirMenu(this);
+		}
+		
+		divMenuBase.appendChild(this.elementoMenu);
+		divMenuTopo.appendChild(this.botao);
+
+		menus.push(this);
+	}
+	selecionar() {
+		this.selecionado = true;
+		this.elementoMenu.classList.add("exibir");
+		this.botao.classList.add("selecionado");
+	}
+	desselecionar() {
+		this.selecionado = false;
+		this.elementoMenu.classList.remove("exibir");
+		this.botao.classList.remove("selecionado");
+	}
+}
+
+class Figura {
 	constructor(argDivisao,argFigura,argAltura,argOitava,argPausa = false) {
 		this.divisao = argDivisao;
 		this.figura = argFigura;
@@ -574,7 +601,7 @@ function criarInstrumentoPadrao(tipo) {
     return novoInstrumento;
 }
 
-export function renderizarPartitura() {
+function renderizarPartitura() {
 	console.log("=== RENDERIZANDO PARTITURA");
 	for (let i = 0; i < numCompassos; i++) {
 		let novoSistema = new Sistema();
@@ -599,6 +626,7 @@ export function renderizarPartitura() {
 }
 
 function testarPartitura() {
+	atualizarLoading(1);
 	tom = 5;
 	criarInstrumentoPadrao('Flauta');
 	criarInstrumentoPadrao('Piano');
@@ -623,6 +651,7 @@ function testarPartitura() {
 	instrumentos[0].pautas[0].compassos[0].adicionarFigura(-1,Duracoes.COLCHEIA,false);
 	instrumentos[0].pautas[0].compassos[0].adicionarFigura(-1,Duracoes.COLCHEIA,false);
 	instrumentos[0].pautas[0].compassos[0].adicionarFigura(-1,Duracoes.SEMINIMA,true);
+	atualizarLoading(-1);
 }
 
 function obterAlturaAleatoria() {
@@ -643,8 +672,45 @@ function selecionarElemento(argElemento) {
 	}
 }
 
-function importarModulo(argModulo) {
-	import("./modulos/"+argModulo+".js");
+async function carregarPagina(argPagina) {
+	atualizarLoading(1);
+	let novoFetch = await fetch(argPagina);
+	let texto = await novoFetch.text();
+	//console.log("Página carregada");
+	atualizarLoading(-1);
+	return texto;
+}
+
+async function importarModulo(argModulo) {
+	atualizarLoading(1);
+	var novoScript = document.createElement("script");
+	novoScript.src = "interno/modulos/"+argModulo+".js";
+	//var novoModulo = await import("./modulos/"+argModulo+".js");
+	//await novoModulo.default();
+	document.body.appendChild(novoScript);
+	console.log("Módulo " + argModulo + " importado");
+	atualizarLoading(-1);
+}
+
+function exibirMenu(argMenu) {
+	menus.forEach(menu => {
+		menu.desselecionar();
+	});
+	argMenu.selecionar();
+}
+
+function exibirMenuPrincipal() {
+	divMenuPrincipal.toggleAttribute("exibir");
+}
+
+function atualizarLoading(argContador=0) {
+	indiceCarregamento+=parseInt(argContador);
+	if (indiceCarregamento==0) {
+		divLoader.style.opacity = 0;
+		divLoader.style.pointerEvents="none";
+	} else {
+		//console.log("LOADING " + indiceCarregamento);
+	}
 }
 //#endregion
 
@@ -670,6 +736,9 @@ document.body.addEventListener("keydown",(e)=>{
 		});
 	}
 });
+document.body.onload = (e)=>{
+	atualizarLoading(-1);
+};
 //#endregion
 
 

@@ -1,12 +1,32 @@
-import {default as Gabriel} from "./../gabriel.js";
+//import {default as Gabriel} from "./../gabriel.js";
+var divMenuEdicao = null;
+var nomeModulo = "Editor";
+var botaoModulo = "✍";
+var menuModulo = null;
+
+async function carregarModulo() {
+	//console.log(Gabriel);
+	let parser = new DOMParser();
+	let paginaModulo = await carregarPagina("./interno/modulos/editor.html");
+	let conteudoModulo = parser.parseFromString(paginaModulo,"text/html");
+	let novoEstilo = document.createElement("link");
+	novoEstilo.rel = "stylesheet";
+	novoEstilo.href = "interno/modulos/editor.css";
+	novoEstilo.type = "text/css";
+	document.head.appendChild(novoEstilo);
+	divMenuEdicao = conteudoModulo.childNodes[0].childNodes[1].childNodes[0];
+	divMenuEdicao = conteudoModulo.getElementsByTagName("div")[0];
+	menuModulo = new Menu(nomeModulo,botaoModulo,divMenuEdicao);
+	return true;
+}
 
 //#region Funções GUI
 var menuEdicao_botaoSelecionado = "";
-export default function selecionarDuracao(argDuracao) {
-	const keys = Object.keys(Gabriel.Duracoes);
+function selecionarDuracao(argDuracao) {
+	const keys = Object.keys(Duracoes);
 	keys.forEach(chave => {
 		//console.log(chave);
-		if (argDuracao==Gabriel.Duracoes[chave]) {
+		if (argDuracao==Duracoes[chave]) {
 			if (menuEdicao_botaoSelecionado!="") {
 				document.getElementById("menuEdicao_botao"+menuEdicao_botaoSelecionado).classList.remove("selecionado");
 			}
@@ -14,49 +34,47 @@ export default function selecionarDuracao(argDuracao) {
 			document.getElementById("menuEdicao_botao"+menuEdicao_botaoSelecionado).classList.add("selecionado");
 		}
 	});
-    //const randomKey = keys[Math.floor(Math.random() * keys.length)]; // Seleciona uma chave aleatória
+}
+window.selecionarDuracao = selecionarDuracao;
+//const randomKey = keys[Math.floor(Math.random() * keys.length)]; // Seleciona uma chave aleatória
 	//console.log(Duracoes[randomKey]);
     //console.log({ [randomKey]: AlturasPx[randomKey] }); // Retorna a chave e o valor correspondente
 	//return AlturasPx[randomKey];
-}
 //#endregion
 
 document.body.addEventListener("keydown",(e)=>{
 	//console.log({_});
-	if (e.code.startsWith("Numpad")) {
+	if (menuModulo.selecionado) {
 		switch (e.code) {
 			case "Numpad1":
-				selecionarDuracao(Gabriel.Duracoes.SEMIFUSA);
+				selecionarDuracao(Duracoes.SEMIFUSA);
 				break;
 			case "Numpad2":
-				selecionarDuracao(Gabriel.Duracoes.FUSA);
+				selecionarDuracao(Duracoes.FUSA);
 				break;
 			case "Numpad3":
-				selecionarDuracao(Gabriel.Duracoes.SEMICOLCHEIA);
+				selecionarDuracao(Duracoes.SEMICOLCHEIA);
 				break;
 			case "Numpad4":
-				selecionarDuracao(Gabriel.Duracoes.COLCHEIA);
+				selecionarDuracao(Duracoes.COLCHEIA);
 				break;
 			case "Numpad5":
-				selecionarDuracao(Gabriel.Duracoes.SEMINIMA);
+				selecionarDuracao(Duracoes.SEMINIMA);
 				break;
 			case "Numpad6":
-				selecionarDuracao(Gabriel.Duracoes.MINIMA);
+				selecionarDuracao(Duracoes.MINIMA);
 				break;
 			case "Numpad7":
-				selecionarDuracao(Gabriel.Duracoes.SEMIBREVE);
+				selecionarDuracao(Duracoes.SEMIBREVE);
 				break;
 			case "Numpad8":
-				selecionarDuracao(Gabriel.Duracoes.BREVE);
+				selecionarDuracao(Duracoes.BREVE);
+				break;
+			case "Escape":
+				menuModulo.desselecionar();
 				break;
 		}
 	}
 });
 
-
-var divMenuEdicao = fetch("./interno/modulos/editor.html").then(response => response.text()).then(data => {
-	let parser = new DOMParser();
-	let conteudo = parser.parseFromString(data,"text/html");
-	divMenuEdicao = conteudo.childNodes[0];
-	console.log(divMenuEdicao);
-});
+carregarModulo();
