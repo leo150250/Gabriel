@@ -1,3 +1,8 @@
+:root {
+    --azul: #5883bd;
+    --azulClaro: #bbd1ee;
+    --azulSelecao: #5883bd40;
+}
 html {
     width: 100%;
     height: 100%;
@@ -11,8 +16,26 @@ body {
     height: 100%;
     overflow: hidden;
 }
+
 button {
     outline: none;
+    padding: 10px;
+    border: none;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    min-height: 3rem;
+    min-width: 3rem;
+    margin-right: 1px;
+}
+button:hover {
+    background-color: #EEE;
+}
+button.selecionado {
+    background-color: var(--azulClaro);
+}
+button:active {
+    background-color: var(--azul);
 }
 
 #loader {
@@ -36,8 +59,8 @@ button {
             background-color: #0001;
         }
         &::-webkit-progress-value {
-            background-color: #bbd1ee;
-            border-bottom: #5883bd solid 1px;
+            background-color: var(--azulClaro);
+            border-bottom: var(--azul) solid 1px;
         }
     }
 }
@@ -96,31 +119,15 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
     z-index: 100;
     box-shadow: 0px 0px 8px #0004;
 }
-.barraMenu button, #menuPrincipal button {
-    padding: 10px;
-    border: none;
-    background-color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    min-height: 3rem;
-    min-width: 3rem;
-    margin-right: 1px;
-}
-.barraMenu button:hover, #menuPrincipal button:hover {
-    background-color: #EEE;
-}
-.barraMenu button.selecionado {
-    background-color: #bbd1ee;
-}
 .barraMenu hr {
     margin: 0.5em;
 }
-
-#menuBase > div {
-    display: none;
+.menu {
+    display: flex;
 }
-#menuBase > div.exibir {
-    display: block;
+
+#menuBase > div:not(.exibir) {
+    display: none;
 }
 
 #partitura {
@@ -216,16 +223,24 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 }
 
 .divisao {
-    min-height: 3px;
+    min-height: 100px;
     text-align: center;
     min-width: 2em;
     position: relative;
+    border-radius: 0.5em;
+}
+.divisao:hover {
+    background-color: var(--azulSelecao);
+}
+.divisao.selecionado {
+    outline: 2px solid var(--azul);
 }
 
 .figura {
     margin: 0px -30px;
     vertical-align: middle;
     position: relative;
+    pointer-events: none;
 }
 
 .sincopa {
@@ -235,10 +250,6 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
     pointer-events: none;
 }
 
-.figura.selecionado {
-    /* background-color: #08f4; */
-    filter: drop-shadow(0px 0px 4px #F00);
-}
 
 .formula {
     display: flex;

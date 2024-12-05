@@ -114,12 +114,6 @@ class Figura {
 		this.el.classList.add("figura");
 		this.el.style.width = "100px";
 		this.el.style.height = "100px";
-		this.el.addEventListener("click",(e)=>{
-			switch (e.button) {
-				case 0: selecionarElemento(this); break;
-				default: console.log(e.button);
-			}
-		});
 		this.obterImagem();
 		//console.log(this.alturaPx);
 		//this.el.src="#";
@@ -232,6 +226,12 @@ class Divisao {
 		this.figuras = [];
 		this.el = document.createElement("div");
 		this.el.classList.add("divisao");
+		this.el.addEventListener("click",(e)=>{
+			switch (e.button) {
+				case 0: selecionarElemento(this); break;
+				default: console.log(e.button);
+			}
+		});
 		this.atualizar();
 		this.compasso.el.appendChild(this.el);
 		this.compasso.divisoes.push(this);
@@ -266,6 +266,7 @@ class Compasso {
 		this.clave = this.pauta.clavePadrao;
 		this.tom = tom;
 		this.andamento = andamento;
+		this.sistema = null;
 		if (this.compassoAnterior!=null) {
 			this.clave = this.compassoAnterior.clave;
 			this.tom = this.compassoAnterior.tom;
@@ -278,6 +279,23 @@ class Compasso {
 		this.el = document.createElement("div");
 		this.el.classList.add("compasso");
 		this.el.style.height = alturaCompassosPx+"px";
+		this.el.addEventListener("click",(e)=>{
+			let posXMouse = e.x;
+			let posYMouse = e.y;
+			/*
+			console.log(posXMouse + "," + posYMouse);
+			//console.log(e);
+			this.divisoes.forEach(divisao => {
+				let posXElemento = divisao.el.offsetLeft + this.el.offsetLeft + this.sistema.el.offsetLeft;
+				console.log(posXElemento);
+				if ((posXMouse > posXElemento)
+				&& (posXMouse < posXElemento + divisao.el.offsetWidth)) {
+					
+					console.log(divisao);
+				}
+			});
+			*/
+		});
 		this.el_cabecalho = document.createElement("div");
 		this.el_cabecalho.classList.add("cabecalho");
 		this.el.appendChild(this.el_cabecalho);
@@ -499,6 +517,7 @@ class Pauta {
 		for (let i = 0; i < numCompassos; i++) {
 			sistemas[i].el.appendChild(this.compassos[i].el);
 			sistemas[i].compassos.push(this.compassos[i]);
+			this.compassos[i].sistema = sistemas[i];
 		}
 	}
 }

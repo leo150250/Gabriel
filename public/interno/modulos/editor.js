@@ -5,6 +5,7 @@ var botaoModulo = "✍";
 var menuModulo = null;
 
 async function carregarModulo() {
+	atualizarLoading(1);
 	//console.log(Gabriel);
 	let parser = new DOMParser();
 	let paginaModulo = await carregarPagina("./interno/modulos/editor.html");
@@ -17,6 +18,7 @@ async function carregarModulo() {
 	divMenuEdicao = conteudoModulo.childNodes[0].childNodes[1].childNodes[0];
 	divMenuEdicao = conteudoModulo.getElementsByTagName("div")[0];
 	menuModulo = new Menu(nomeModulo,botaoModulo,divMenuEdicao);
+	atualizarLoading(-1);
 	return true;
 }
 
@@ -35,7 +37,6 @@ function selecionarDuracao(argDuracao) {
 		}
 	});
 }
-window.selecionarDuracao = selecionarDuracao;
 //const randomKey = keys[Math.floor(Math.random() * keys.length)]; // Seleciona uma chave aleatória
 	//console.log(Duracoes[randomKey]);
     //console.log({ [randomKey]: AlturasPx[randomKey] }); // Retorna a chave e o valor correspondente
@@ -72,6 +73,10 @@ document.body.addEventListener("keydown",(e)=>{
 				break;
 			case "Escape":
 				menuModulo.desselecionar();
+				break;
+			case "NumpadEnter":
+			case "Enter":
+				//TODO: Adicionar função de adicionar figura à divisão selecionada
 				break;
 		}
 	}
