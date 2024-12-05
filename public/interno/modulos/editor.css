@@ -2,3 +2,8 @@ div.menuEdicao_Figuras {
 	display: inline-grid;
 	grid-template-columns: 3em 3em 3em;
 }
+div.overlayEditor {
+	pointer-events: none;
+	position: absolute;
+	z-index: 10;
+}

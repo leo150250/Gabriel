@@ -73,7 +73,7 @@ const AlturasPx = {
 
 //#region Classes
 class Menu {
-	constructor(argNome,argTextoBotao,argElementoMenu) {
+	constructor(argNome,argTextoBotao,argElementoMenu,argFuncaoCallback = null) {
 		this.selecionado = false;
 		this.elementoMenu = argElementoMenu;
 		this.botao = document.createElement("button");
@@ -82,21 +82,30 @@ class Menu {
 		this.botao.onclick = ()=>{
 			exibirMenu(this);
 		}
-		
+		this.funcaoCallback = argFuncaoCallback;
 		divMenuBase.appendChild(this.elementoMenu);
 		divMenuTopo.appendChild(this.botao);
-
 		menus.push(this);
 	}
 	selecionar() {
-		this.selecionado = true;
-		this.elementoMenu.classList.add("exibir");
-		this.botao.classList.add("selecionado");
+		if (!this.selecionado) {
+			this.selecionado = true;
+			this.elementoMenu.classList.add("exibir");
+			this.botao.classList.add("selecionado");
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
 	}
 	desselecionar() {
-		this.selecionado = false;
-		this.elementoMenu.classList.remove("exibir");
-		this.botao.classList.remove("selecionado");
+		if (this.selecionado) {
+			this.selecionado = false;
+			this.elementoMenu.classList.remove("exibir");
+			this.botao.classList.remove("selecionado");
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
 	}
 }
 
@@ -220,10 +229,15 @@ class Figura {
 }
 
 class Divisao {
-	constructor(argCompasso,argTempos = 4) {
+	constructor(argCompasso,argTempos = 4,argDivisaoAnterior = null) {
 		this.compasso = argCompasso;
 		this.tempos = argTempos;
 		this.figuras = [];
+		this.divisaoAnterior = argDivisaoAnterior;
+		this.divisaoPosterior = null;
+		if (this.divisaoAnterior != null) {
+			this.divisaoAnterior.divisaoPosterior = this;
+		}
 		this.el = document.createElement("div");
 		this.el.classList.add("divisao");
 		this.el.addEventListener("click",(e)=>{
@@ -244,6 +258,8 @@ class Divisao {
 		if (novosTempos>0) {
 			//console.log("Sobrou " + novosTempos + " tempos");
 			novaDivisao = this.compasso.adicionarDivisao(novosTempos);
+			this.divisaoPosterior = novaDivisao;
+			novaDivisao.divisaoAnterior = this;
 		}
 		this.atualizar();
 		return [this, novaDivisao];
@@ -461,7 +477,11 @@ class Compasso {
 		if (argDivisao == -1) {
 			divisao = this.divisoes[this.divisoes.length-1];
 		} else {
-			divisao = this.divisoes[argDivisao];
+			if (typeof argDivisao == "number") {
+				divisao = this.divisoes[argDivisao];
+			} else if (argDivisao instanceof Divisao) {
+				divisao = argDivisao;
+			}
 		}
 		if (this.obterTemposDivisoes() < this.andamento[0]) {
 			if (divisao.tempos > argFigura) {
@@ -492,13 +512,31 @@ class Compasso {
 		//console.log("Obteve " + tempos);
 		return tempos;
 	}
+	obterUltimaDivisao() {
+		return this.divisoes[this.divisoes.length - 1];
+	}
+	obterNumero() {
+		let numero = 0;
+		for (let i = 0; i < this.pauta.compassos.length; i++) {
+			if (this.pauta.compassos[i] == this) {
+				numero = i;
+				break;
+			}
+		}
+		return numero;
+	}
 }
 
 class Pauta {
-	constructor(argInstrumento,argClavePadrao) {
+	constructor(argInstrumento,argClavePadrao,argPautaAnterior = null) {
 		this.instrumento = argInstrumento;
 		this.clavePadrao = argClavePadrao;
 		this.compassos = [];
+		this.pautaAnterior = argPautaAnterior;
+		this.pautaPosterior = null;
+		if (this.pautaAnterior != null) {
+			this.pautaAnterior.pautaPosterior = this;
+		}
 		for (let i = 0; i < numCompassos; i++) {
 			if (i > 0) {
 				this.compassos.push(new Compasso(this,this.compassos[i-1]));
@@ -523,16 +561,30 @@ class Pauta {
 }
 
 class Instrumento {
-	constructor(argNome,argAbrev,argPautas=[]) {
+	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null) {
 		this.nome = "";
 		this.abreviatura = "";
 		this.el_nome = document.createElement("div");
 		this.atualizarNome(argNome, argAbrev);
 		this.pautas = [];
 		this.transposicao = 0;
-		argPautas.forEach(pauta => {
-			this.adicionarPauta(pauta);
-		});
+		this.instrumentoAnterior = argInstrumentoAnterior;
+		this.instrumentoPosterior = null;
+		if (this.instrumentoAnterior != null) {
+			console.log(argInstrumentoAnterior);
+			this.instrumentoAnterior.instrumentoPosterior = this;
+		}
+		for (let i = 0; i < argPautas.length; i++) {
+			if (i > 0) {
+				console.log(argPautas[i]);
+				this.adicionarPauta(argPautas[i],this.pautas[i-1]);
+			} else {
+				this.adicionarPauta(argPautas[i]);
+			}
+		}
+		//argPautas.forEach(pauta => {
+		//	this.adicionarPauta(pauta);
+		//});
 		new Parte(this.nome,[this]);
 		instrumentos.push(this);
 	}
@@ -543,14 +595,18 @@ class Instrumento {
 			this.el_nome.innerHTML = this.nome;
 		}
 	}
-	adicionarPauta(argPauta) {
-		let novaPauta = new Pauta(this,argPauta);
+	adicionarPauta(argPauta,argPautaAnterior=null) {
+		let novaPauta = new Pauta(this,argPauta,argPautaAnterior);
 		this.pautas.push(novaPauta);
+		return novaPauta;
 	}
 	desenhar() {
 		this.pautas.forEach(pauta => {
 			pauta.desenhar();
 		})
+	}
+	obterUltimaPauta() {
+		return this.pautas[this.pautas.length - 1];
 	}
 }
 
@@ -616,7 +672,12 @@ function criarInstrumentoPadrao(tipo) {
         default:
             throw new Error('Tipo de instrumento padrão desconhecido');
     }
-    const novoInstrumento = new Instrumento(tipo, abreviatura, pautas);
+	var novoInstrumento;
+	if (instrumentos.length == 0) {
+    	novoInstrumento = new Instrumento(tipo, abreviatura, pautas);
+	} else {
+		novoInstrumento = new Instrumento(tipo, abreviatura, pautas, instrumentos[instrumentos.length - 1]);
+	}
     return novoInstrumento;
 }
 
@@ -689,6 +750,8 @@ function selecionarElemento(argElemento) {
 	if (elementoSelecionado!=null) {
 		elementoSelecionado.el.classList.add("selecionado");
 	}
+	console.log("Elemento selecionado");
+	console.log(argElemento);
 }
 
 async function carregarPagina(argPagina) {
@@ -712,10 +775,14 @@ async function importarModulo(argModulo) {
 }
 
 function exibirMenu(argMenu) {
-	menus.forEach(menu => {
-		menu.desselecionar();
-	});
-	argMenu.selecionar();
+	if (argMenu.selecionado) {
+		argMenu.desselecionar();
+	} else {
+		menus.forEach(menu => {
+			menu.desselecionar();
+		});
+		argMenu.selecionar();
+	}
 }
 
 function exibirMenuPrincipal() {
