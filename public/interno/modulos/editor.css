@@ -6,4 +6,10 @@ div.overlayEditor {
 	pointer-events: none;
 	position: absolute;
 	z-index: 10;
+	align-items: center;
+}
+div.overlayEditor img.cursor {
+	position: absolute;
+	margin: 0px -25px;
+	filter: contrast(0) sepia(1) hue-rotate(180deg);
 }

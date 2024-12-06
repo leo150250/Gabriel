@@ -3,6 +3,7 @@ const divPartitura = document.getElementById("partitura");
 const divMenuTopo = document.getElementById("menuTopo");
 const divMenuBase = document.getElementById("menuBase");
 const divLoader = document.getElementById("loader");
+const pLoader = document.getElementById("loaderTexto");
 const divMenuPrincipal = document.getElementById("menuPrincipal");
 const alturaCompassosPx = 150;
 const alturaLinhasPautasPx = 6;
@@ -81,6 +82,7 @@ class Menu {
 		this.botao.title = argNome;
 		this.botao.onclick = ()=>{
 			exibirMenu(this);
+			this.botao.blur();
 		}
 		this.funcaoCallback = argFuncaoCallback;
 		divMenuBase.appendChild(this.elementoMenu);
@@ -116,8 +118,10 @@ class Figura {
 		this.sincopa = null;
 		this.sincopada = null;
 		this.altura = argAltura;
+		//console.log(this.altura);
+		this.oitava = argOitava;
 		this.invertida = false;
-		this.alturaPx = this.divisao.compasso.pauta.alturaDo3Px;
+		this.alturaPx = this.obterAlturaNota();
 		//this.alturaPx = obterAlturaAleatoria();
 		this.el = document.createElement("img");
 		this.el.classList.add("figura");
@@ -139,6 +143,7 @@ class Figura {
 		this.atualizarElemento();
 	}
 	atualizarElemento(argReplicar=true) {
+		this.alturaPx = obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
 		this.el.style.top = this.alturaPx + "px";
 		if (this.sincopada!=null) {
 			this.invertida = this.sincopada.invertida;
@@ -188,18 +193,11 @@ class Figura {
 		}
 	}
 	obterImagem() {
-		let imagem="";
-		switch (this.figura) {
-			case 4: imagem = "Semibreve"; break;
-			case 2: imagem = "Minima"; break;
-			case 1: imagem = "Seminima"; break;
-			case 0.5: imagem = "Colcheia"; break;
-		}
-		if (imagem!="") {
-			this.el.src="interno/imagens/figura" + imagem + ".svg";
-		} else {
-			console.log("Imagem diferente: " + imagem);
-		}
+		let imagem=obterImagemFiguraDuracao(this.figura);
+		this.el.src="interno/imagens/figura" + imagem + ".svg";
+	}
+	obterAlturaNota() {
+		return obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
 	}
 	definirSincopa(argDestino=null) {
 		if (argDestino==null) {
@@ -219,11 +217,27 @@ class Figura {
 		}
 	}
 	subirAltura() {
-		this.alturaPx -= alturaLinhasPautasPx;
+		switch (this.altura) {
+			case Alturas.DO: this.altura = Alturas.RE; break;
+			case Alturas.RE: this.altura = Alturas.MI; break;
+			case Alturas.MI: this.altura = Alturas.FA; break;
+			case Alturas.FA: this.altura = Alturas.SOL; break;
+			case Alturas.SOL: this.altura = Alturas.LA; break;
+			case Alturas.LA: this.altura = Alturas.SI; break;
+			case Alturas.SI: this.altura = Alturas.DO; this.oitava++; break;
+		}
 		this.atualizarElemento();
 	}
 	descerAltura() {
-		this.alturaPx += alturaLinhasPautasPx;
+		switch (this.altura) {
+			case Alturas.DO: this.altura = Alturas.SI; this.oitava--; break;
+			case Alturas.RE: this.altura = Alturas.DO; break;
+			case Alturas.MI: this.altura = Alturas.RE; break;
+			case Alturas.FA: this.altura = Alturas.MI; break;
+			case Alturas.SOL: this.altura = Alturas.FA; break;
+			case Alturas.LA: this.altura = Alturas.SOL; break;
+			case Alturas.SI: this.altura = Alturas.LA; break;
+		}
 		this.atualizarElemento();
 	}
 }
@@ -288,6 +302,12 @@ class Compasso {
 			this.tom = this.compassoAnterior.tom;
 			this.andamento = this.compassoAnterior.andamento;
 			this.compassoAnterior.compassoPosterior = this;
+		}
+		this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx;
+		switch (this.clave) {
+			case Claves.SOL: this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx; break;
+			case Claves.FA: this.alturaDo3Px = AlturasPx.ESPACO2 - alturaLinhasOitavasPx; break;
+			case Claves.DO: this.alturaDo3Px = AlturasPx.LINHA3; break;
 		}
 		this.barraEsquerda = Barras.SIMPLES;
 		this.barraDireita = Barras.SIMPLES;
@@ -471,7 +491,7 @@ class Compasso {
 		let novaDivisao = new Divisao(this,argTempos);
 		return novaDivisao;
 	}
-	adicionarFigura(argDivisao,argFigura,argPausa = false) {
+	adicionarFigura(argDivisao,argFigura,argPausa = false,argAltura = Alturas.DO,argOitava = 4) {
 		let divisao = null;
 		let sobraFigura = 0;
 		if (argDivisao == -1) {
@@ -493,13 +513,13 @@ class Compasso {
 				sobraFigura=argFigura - divisao.tempos;
 				argFigura=divisao.tempos;
 			}
-			let notaAdicionada = divisao.adicionarFigura(argFigura,Alturas.DO,4);
+			let notaAdicionada = divisao.adicionarFigura(argFigura,argAltura,argOitava);
 			if (sobraFigura>0) {
-				notaAdicionada.definirSincopa(this.compassoPosterior.adicionarFigura(-1,sobraFigura,argPausa));
+				notaAdicionada.definirSincopa(this.compassoPosterior.adicionarFigura(-1,sobraFigura,argPausa,argAltura,argOitava));
 			}
 			return notaAdicionada;
 		} else {
-			return this.compassoPosterior.adicionarFigura(-1,argFigura,argPausa);
+			return this.compassoPosterior.adicionarFigura(-1,argFigura,argPausa,argAltura,argOitava);
 		}
 	}
 	obterTemposDivisoes() {
@@ -544,13 +564,10 @@ class Pauta {
 				this.compassos.push(new Compasso(this));
 			}
 		}
-		this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx;
 	}
-
 	definirInstrumento(argInstrumento) {
 		this.instrumento = argInstrumento;
 	}
-
 	desenhar() {
 		for (let i = 0; i < numCompassos; i++) {
 			sistemas[i].el.appendChild(this.compassos[i].el);
@@ -571,12 +588,12 @@ class Instrumento {
 		this.instrumentoAnterior = argInstrumentoAnterior;
 		this.instrumentoPosterior = null;
 		if (this.instrumentoAnterior != null) {
-			console.log(argInstrumentoAnterior);
+			//console.log(argInstrumentoAnterior);
 			this.instrumentoAnterior.instrumentoPosterior = this;
 		}
 		for (let i = 0; i < argPautas.length; i++) {
 			if (i > 0) {
-				console.log(argPautas[i]);
+				//console.log(argPautas[i]);
 				this.adicionarPauta(argPautas[i],this.pautas[i-1]);
 			} else {
 				this.adicionarPauta(argPautas[i]);
@@ -616,6 +633,10 @@ class Sistema {
 		this.el.classList.add("sistema");
 		this.compassos = [];
 		sistemas.push(this);
+		this.largura = this.el.offsetWidth;
+	}
+	atualizar() {
+		console.log("hmmm");
 	}
 }
 
@@ -705,6 +726,68 @@ function renderizarPartitura() {
 	});
 }
 
+function obterImagemFiguraDuracao(argDuracao) {
+	let imagem = "";
+	switch (argDuracao) {
+		case 4: imagem = "Semibreve"; break;
+		case 2: imagem = "Minima"; break;
+		case 1: imagem = "Seminima"; break;
+		case 0.5: imagem = "Colcheia"; break;
+		case 0.25: imagem = "Semicolcheia"; break;
+		case 0.125: imagem = "Fusa"; break;
+		case 0.0625: imagem = "Semifusa"; break;
+		default: console.log("Duração não-identificada: " + argDuracao);
+	}
+	return imagem;
+}
+
+function obterNotaAltura(argAlturaPx,argClave) {
+	let alturaNota = null;
+	let alturaOitava = 0;
+	let nota = null;
+	switch (argClave) {
+		case Claves.DO:
+			alturaNota = (((-argAlturaPx % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor(-argAlturaPx / alturaLinhasOitavasPx) + 3;
+			break;
+		case Claves.SOL:
+			alturaNota=((((-argAlturaPx + (alturaLinhasPautasPx * 6)) % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor((-argAlturaPx + (alturaLinhasPautasPx * 6)) / alturaLinhasOitavasPx) + 3;
+			break;
+		case Claves.FA:
+			alturaNota=((((-argAlturaPx + (alturaLinhasPautasPx)) % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor((-argAlturaPx + (alturaLinhasPautasPx)) / alturaLinhasOitavasPx) + 2;
+			break;
+	}
+	nota = Alturas[Object.keys(Alturas)[alturaNota]];
+	return {
+		nota:nota,
+		oitava:alturaOitava
+	}
+}
+function obterAlturaNota(argNota,argOitava,argClave) {
+	let alturaPx = 0;
+	let alturaNota = null;
+	switch (argClave) {
+		case Claves.SOL: alturaPx = AlturasPx.ESPACO3 + alturaLinhasOitavasPx; break;
+		case Claves.FA: alturaPx = AlturasPx.ESPACO2 - alturaLinhasOitavasPx; break;
+		case Claves.DO: alturaPx = AlturasPx.LINHA3; break;
+	}
+	switch (argNota) {
+		case Alturas.DO: alturaPx -= alturaLinhasPautasPx * 0; break;
+		case Alturas.RE: alturaPx -= alturaLinhasPautasPx * 1; break;
+		case Alturas.MI: alturaPx -= alturaLinhasPautasPx * 2; break;
+		case Alturas.FA: alturaPx -= alturaLinhasPautasPx * 3; break;
+		case Alturas.SOL: alturaPx -= alturaLinhasPautasPx * 4; break;
+		case Alturas.LA: alturaPx -= alturaLinhasPautasPx * 5; break;
+		case Alturas.SI: alturaPx -= alturaLinhasPautasPx * 6; break;
+	}
+	alturaPx -= alturaLinhasOitavasPx * (argOitava - 3);
+	//console.log(indiceAltura);
+	//console.log(alturaPx);
+	return alturaPx;
+}
+
 function testarPartitura() {
 	atualizarLoading(1);
 	tom = 5;
@@ -740,7 +823,7 @@ function obterAlturaAleatoria() {
 	//console.log(AlturasPx[randomKey]);
     //return { [randomKey]: AlturasPx[randomKey] }; // Retorna a chave e o valor correspondente
 	return AlturasPx[randomKey];
-};
+}
 
 function selecionarElemento(argElemento) {
 	if (elementoSelecionado!=null) {
@@ -750,8 +833,8 @@ function selecionarElemento(argElemento) {
 	if (elementoSelecionado!=null) {
 		elementoSelecionado.el.classList.add("selecionado");
 	}
-	console.log("Elemento selecionado");
-	console.log(argElemento);
+	//console.log("Elemento selecionado");
+	//console.log(argElemento);
 }
 
 async function carregarPagina(argPagina) {
@@ -798,6 +881,9 @@ function atualizarLoading(argContador=0) {
 		//console.log("LOADING " + indiceCarregamento);
 	}
 }
+function textoLoading(argTexto) {
+	pLoader.innerHTML = argTexto;
+}
 //#endregion
 
 
@@ -825,6 +911,14 @@ document.body.addEventListener("keydown",(e)=>{
 document.body.onload = (e)=>{
 	atualizarLoading(-1);
 };
+document.addEventListener('error', function(event) {
+	textoLoading("ERRO: " + event.message);
+    console.log('Captured error:', event.message);
+    console.log('Source:', event.filename);
+    console.log('Line:', event.lineno);
+    console.log('Column:', event.colno);
+    console.log('Error object:', event.error);
+},true);
 //#endregion
 
 

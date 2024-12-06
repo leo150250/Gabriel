@@ -3,9 +3,6 @@ var divMenuEdicao = null;
 var nomeModulo = "Editor";
 var botaoModulo = "✍";
 var menuModulo = null;
-var divEditor = document.createElement("div");
-divEditor.classList.add("overlayEditor");
-
 async function carregarModulo() {
 	atualizarLoading(1);
 	//console.log(Gabriel);
@@ -22,9 +19,85 @@ async function carregarModulo() {
 	menuModulo = new Menu(nomeModulo,botaoModulo,divMenuEdicao,atualizarEditor);
 	divPartitura.appendChild(divEditor);
 	atualizarEditor();
+	selecionarDuracao(Duracoes.COLCHEIA);
 	atualizarLoading(-1);
 	return true;
 }
+
+//#region Editor
+var divEditor = document.createElement("div");
+divEditor.classList.add("overlayEditor");
+var imgCursorEditor = document.createElement("img");
+imgCursorEditor.classList.add("cursor");
+imgCursorEditor.src="#";
+divEditor.appendChild(imgCursorEditor);
+
+var alturaCursor = 0;
+var cursorAdicionar = true;
+
+function verificarEditorSelecionado() {
+	let resultado = false;
+	if (menuModulo.selecionado) {
+		if (elementoSelecionado!=null) {
+			if (elementoSelecionado instanceof Divisao) {
+				resultado = true;
+			}
+		}
+	}
+	return resultado;
+}
+
+function atualizarEditor() {
+	divEditor.style.display="none";
+	if (verificarEditorSelecionado()) {
+		divEditor.style.display="flex";
+		divEditor.style.left = (elementoSelecionado.el.offsetLeft + elementoSelecionado.compasso.el.offsetLeft + elementoSelecionado.compasso.sistema.el.offsetLeft) + "px";
+		divEditor.style.top = (elementoSelecionado.el.offsetTop + elementoSelecionado.compasso.el.offsetTop) + "px";
+		divEditor.style.width = elementoSelecionado.el.offsetWidth + "px";
+		divEditor.style.height = elementoSelecionado.el.offsetHeight + "px";
+		imgCursorEditor.style.top = alturaCursor + "px";
+		if (elementoSelecionado.figuras.length>0) {
+			cursorAdicionar = false;
+			imgCursorEditor.style.display = "none";
+		} else {
+			cursorAdicionar = true;
+			imgCursorEditor.style.display = "block";
+		}
+	}
+}
+
+function adicionarFigura() {
+	if (verificarEditorSelecionado()) {
+		if (duracaoSelecionada != null) {
+			let alturaNota = obterNotaAltura(alturaCursor,elementoSelecionado.compasso.clave);
+			//console.log(alturaNota);
+			elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,false,alturaNota.nota,alturaNota.oitava);
+			if (elementoSelecionado.compasso.obterTemposDivisoes() == elementoSelecionado.compasso.andamento[0]) {
+				selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
+			} else {
+				selecionarElemento(elementoSelecionado.divisaoPosterior);
+			}
+			elementoSelecionado.el.scrollIntoView({
+				behavior: "smooth",
+				block: "center",
+				inline: "center"
+			});
+		}
+	}
+}
+
+function subirAlturaCursor() {
+	alturaCursor -= alturaLinhasPautasPx;
+	atualizarEditor();
+}
+function descerAlturaCursor() {
+	alturaCursor += alturaLinhasPautasPx;
+	atualizarEditor();
+}
+//#endregion
+
+
+
 
 //#region Funções GUI
 var menuEdicao_botaoSelecionado = "";
@@ -40,45 +113,16 @@ function selecionarDuracao(argDuracao) {
 			menuEdicao_botaoSelecionado=chave;
 			duracaoSelecionada=argDuracao;
 			document.getElementById("menuEdicao_botao"+menuEdicao_botaoSelecionado).classList.add("selecionado");
+			imgCursorEditor.src="interno/imagens/figura" + obterImagemFiguraDuracao(duracaoSelecionada) + ".svg";
 		}
 	});
 }
-function atualizarEditor() {
-	divEditor.style.display="none";
-	if (menuModulo.selecionado) {
-		if (elementoSelecionado!=null) {
-			if (elementoSelecionado instanceof Divisao) {
-				divEditor.style.display="block";
-				divEditor.style.left = (elementoSelecionado.el.offsetLeft + elementoSelecionado.compasso.el.offsetLeft + elementoSelecionado.compasso.sistema.el.offsetLeft) + "px";
-				divEditor.style.top = (elementoSelecionado.el.offsetTop + elementoSelecionado.compasso.el.offsetTop) + "px";
-				divEditor.style.width = elementoSelecionado.el.offsetWidth + "px";
-				divEditor.style.height = elementoSelecionado.el.offsetHeight + "px";
-			}
-		}
-	}
-}
-
 var selecionarElemento_ = selecionarElemento;
 selecionarElemento = function(argElemento) {
 	selecionarElemento_.apply(this,arguments);
 	atualizarEditor();
 }
 //#endregion
-
-function adicionarFigura() {
-	if (elementoSelecionado != null) {
-		if (elementoSelecionado instanceof Divisao) {
-			if (duracaoSelecionada != null) {
-				elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada);
-				if (elementoSelecionado.compasso.obterTemposDivisoes() == elementoSelecionado.compasso.andamento[0]) {
-					selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
-				} else {
-					selecionarElemento(elementoSelecionado.divisaoPosterior);
-				}
-			}
-		}
-	}
-}
 
 document.body.addEventListener("keydown",(e)=>{
 	//console.log({_});
@@ -158,35 +202,51 @@ document.body.addEventListener("keydown",(e)=>{
 			case "ArrowUp": {
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
-					if (elementoSelecionado.compasso.pauta.pautaAnterior!=null) {
-						selecionarElemento(elementoSelecionado.compasso.pauta.pautaAnterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+					if (e.shiftKey) {
+						if (elementoSelecionado.compasso.pauta.pautaAnterior!=null) {
+							selecionarElemento(elementoSelecionado.compasso.pauta.pautaAnterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+						} else {
+							if (elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior!=null) {
+								selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior.obterUltimaPauta().compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+							}
+						}
+						elementoSelecionado.el.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+							inline: "center"
+						});
 					} else {
-						if (elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior!=null) {
-							selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior.obterUltimaPauta().compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+						if (cursorAdicionar) {
+							subirAlturaCursor();
+						} else {
+							elementoSelecionado.figuras[0].subirAltura();
 						}
 					}
-					elementoSelecionado.el.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-						inline: "center"
-					});
 				}
 			} break;
 			case "ArrowDown": {
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
-					if (elementoSelecionado.compasso.pauta.pautaPosterior!=null) {
-						selecionarElemento(elementoSelecionado.compasso.pauta.pautaPosterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+					if (e.shiftKey) {
+						if (elementoSelecionado.compasso.pauta.pautaPosterior!=null) {
+							selecionarElemento(elementoSelecionado.compasso.pauta.pautaPosterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+						} else {
+							if (elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior!=null) {
+								selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior.pautas[0].compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+							}
+						}
+						elementoSelecionado.el.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+							inline: "center"
+						});
 					} else {
-						if (elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior!=null) {
-							selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior.pautas[0].compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
+						if (cursorAdicionar) {
+							descerAlturaCursor();
+						} else {
+							elementoSelecionado.figuras[0].descerAltura();
 						}
 					}
-					elementoSelecionado.el.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-						inline: "center"
-					});
 				}
 			} break;
 		}
