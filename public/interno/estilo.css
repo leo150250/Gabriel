@@ -224,7 +224,7 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 
 .divisao {
     min-height: 100px;
-    text-align: center;
+    text-align: left;
     min-width: 2em;
     position: relative;
     border-radius: 0.5em;

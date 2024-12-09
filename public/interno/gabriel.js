@@ -142,6 +142,10 @@ class Figura {
 		this.divisao.el.appendChild(this.el_sincopa);
 		this.atualizarElemento();
 	}
+	atualizar() {
+		this.atualizarElemento();
+		this.divisao.chamarAtualizacaoSistema();
+	}
 	atualizarElemento(argReplicar=true) {
 		this.alturaPx = obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
 		this.el.style.top = this.alturaPx + "px";
@@ -162,11 +166,11 @@ class Figura {
 			this.el.style.backgroundImage="none";
 		}
 		if (this.divisao.tempos!=this.figura) {
-			console.log("Atualizar imagem");
+			//console.log("Atualizar imagem");
 			this.obterImagem();
 		}
 		if (this.sincopa!=null) {
-			console.log("Atualizar síncopa");
+			//console.log("Atualizar síncopa");
 
 			let calculoLarguraPx = ((parseInt(this.sincopa.el.x) - parseInt(this.el.x) - 10) / (window.devicePixelRatio));
 			//console.log(this.sincopa.el.x + " - " + this.el.x + " = " + calculoLarguraPx);
@@ -245,6 +249,7 @@ class Figura {
 class Divisao {
 	constructor(argCompasso,argTempos = 4,argDivisaoAnterior = null) {
 		this.compasso = argCompasso;
+		//console.log(this.compasso);
 		this.tempos = argTempos;
 		this.figuras = [];
 		this.divisaoAnterior = argDivisaoAnterior;
@@ -285,12 +290,20 @@ class Divisao {
 	}
 	atualizar() {
 		this.el.style.flexBasis = ((this.tempos / this.compasso.andamento[0]) * 100) + "%";
+		this.figuras.forEach(figura => {
+			figura.atualizar();
+		});
+		this.chamarAtualizacaoSistema();
+	}
+	chamarAtualizacaoSistema() {
+		this.compasso.chamarAtualizacaoSistema();
 	}
 }
 
 class Compasso {
-	constructor(argPauta,argCompassoAnterior = null) {
+	constructor(argPauta,argCompassoAnterior = null,argSistema = null) {
 		this.pauta = argPauta;
+		this.sistema = argSistema;
 		this.compassoAnterior = argCompassoAnterior;
 		this.compassoPosterior = null;
 		this.clave = this.pauta.clavePadrao;
@@ -406,6 +419,14 @@ class Compasso {
 		}
 		if (this.compassoPosterior==null) {
 			this.atualizarBarraDireita(Barras.FIM);
+		}
+		this.divisoes.forEach(divisao => {
+			divisao.atualizar();
+		});
+	}
+	chamarAtualizacaoSistema() {
+		if (this.sistema != null) {
+			this.sistema.atualizar();
 		}
 	}
 	atualizarBarraEsquerda(argBarra = Barras.NENHUMA) {
@@ -636,7 +657,14 @@ class Sistema {
 		this.largura = this.el.offsetWidth;
 	}
 	atualizar() {
-		console.log("hmmm");
+		//console.log("Atualizar sistema");
+		if (this.el.offsetWidth != this.largura) {
+			console.log("Largura diferente!");
+			this.largura = this.el.offsetWidth;
+			this.compassos.forEach(compasso => {
+				compasso.atualizar();
+			});
+		}
 	}
 }
 
