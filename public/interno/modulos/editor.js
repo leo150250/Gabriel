@@ -76,7 +76,11 @@ function adicionarFigura() {
 				selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
 				if (elementoSelecionado.figuras.length > 0) {
 					if (elementoSelecionado.figuras[0].sincopada!=null) {
-						selecionarElemento(elementoSelecionado.divisaoPosterior);
+						if (selecionarElemento.divisaoPosterior==null) {
+							selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
+						} else {
+							selecionarElemento(elementoSelecionado.divisaoPosterior);
+						}
 					}
 				}
 			} else {

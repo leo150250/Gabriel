@@ -757,6 +757,7 @@ function renderizarPartitura() {
 function obterImagemFiguraDuracao(argDuracao) {
 	let imagem = "";
 	switch (argDuracao) {
+		case 8: imagem = "Breve"; break;
 		case 4: imagem = "Semibreve"; break;
 		case 2: imagem = "Minima"; break;
 		case 1: imagem = "Seminima"; break;

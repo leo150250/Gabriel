@@ -2,6 +2,16 @@ div.menuEdicao_Figuras {
 	display: inline-grid;
 	grid-template-columns: 3em 3em 3em;
 }
+div.menuEdicao_Figuras button {
+	overflow: hidden;
+}
+div.menuEdicao_Figuras button img {
+	margin: -25px;
+	margin-top: -15px;
+	width: 50px;
+	height: 50px;
+	vertical-align: middle;
+}
 div.overlayEditor {
 	pointer-events: none;
 	position: absolute;
