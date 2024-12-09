@@ -1,16 +1,48 @@
 <div id="menuEdicao" class="menu">
+	<div class="menuEdicao_Alturas">
+		<button type="button" title="Dó">C</button>
+		<button type="button" title="Ré">D</button>
+		<button type="button" title="Mi">E</button>
+		<button type="button" title="Fá">F</button>
+		<button type="button" title="Sol">G</button>
+		<button type="button" title="Lá">A</button>
+		<button type="button" title="Si">B</button>
+		<button type="button" title="Compasso anterior">⇐</button>
+		<button type="button" title="Subir cursor">↑</button>
+		<button type="button" title="Compasso posterior">⇒</button>
+		<button type="button" title="Pauta acima">⇑</button>
+		<label for="menuEdicao_oitava" class="colspan2">Oitava:</label>
+		<input id="menuEdicao_oitava" type="number" value="3">
+		<button type="button" title="Divisão anterior">←</button>
+		<button type="button" title="Descer cursor">↓</button>
+		<button type="button" title="Divisão posterior">→</button>
+		<button type="button" title="Pauta abaixo">⇓</button>
+		<div></div>
+		<div></div>
+		<div></div>
+		<button type="button" title="Ligadura">T</button>
+		<button type="button" title="Expressão">X</button>
+		<button type="button" title="Quiáltera">♪♪♪</button>
+	</div>
+	<hr>
 	<div class="menuEdicao_Figuras">
 		<button type="button" title="Semibreve" id="menuEdicao_botaoSEMIBREVE" onclick="selecionarDuracao(Duracoes.SEMIBREVE)"><img alt="Semibreve" src="interno/imagens/figuraSemibreve.svg"></button>
 		<button type="button" title="Breve" id="menuEdicao_botaoBREVE" onclick="selecionarDuracao(Duracoes.BREVE)"><img alt="Breve" src="interno/imagens/figuraBreve.svg"></button>
-		<button type="button" title="-" >-</button>
+		<button type="button" title="Bemol">b</button>
+		<button type="button" title="Sustenido">#</button>
 		
 		<button type="button" title="Colcheia" id="menuEdicao_botaoCOLCHEIA" onclick="selecionarDuracao(Duracoes.COLCHEIA)"><img alt="Colcheia" src="interno/imagens/figuraColcheia.svg"></button>
 		<button type="button" title="Seminima" id="menuEdicao_botaoSEMINIMA" onclick="selecionarDuracao(Duracoes.SEMINIMA)"><img alt="Semínima" src="interno/imagens/figuraSeminima.svg"></button>
 		<button type="button" title="Minima" id="menuEdicao_botaoMINIMA" onclick="selecionarDuracao(Duracoes.MINIMA)"><img alt="Minima" src="interno/imagens/figuraMinima.svg"></button>
+		<button type="button" title="Ponto de aumento">.</button>
 
 		<button type="button" title="Semifusa" id="menuEdicao_botaoSEMIFUSA" onclick="selecionarDuracao(Duracoes.SEMIFUSA)"><img alt="Semifusa" src="interno/imagens/figuraSemifusa.svg"></button>
 		<button type="button" title="Fusa" id="menuEdicao_botaoFUSA" onclick="selecionarDuracao(Duracoes.FUSA)"><img alt="Fusa" src="interno/imagens/figuraFusa.svg"></button>
 		<button type="button" title="Semicolcheia" id="menuEdicao_botaoSEMICOLCHEIA" onclick="selecionarDuracao(Duracoes.SEMICOLCHEIA)"><img alt="Semicolcheia" src="interno/imagens/figuraSemicolcheia.svg"></button>
+		<button type="button" class="botaoEnviar" title="Aplicar nota" id="menuEdicao_botaoAdicionar" onclick="adicionarFigura()">&gt;</button>
+
+		<button type="button" title="Pausa">P</button>
+		<button type="button" title="Expressão">E</button>
+		<button type="button" title="Articulação">A</button>
 	</div>
-	<button id="menuEdicao_botaoAdicionar">&gt;</button>
 </div>

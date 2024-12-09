@@ -1,9 +1,14 @@
 div.menuEdicao_Figuras {
 	display: inline-grid;
-	grid-template-columns: 3em 3em 3em;
+	grid-template-columns: 3em 3em 3em 3em;
+	gap: 1px;
+	margin-right: 1px;
 }
 div.menuEdicao_Figuras button {
 	overflow: hidden;
+}
+div.menuEdicao_Figuras button.botaoEnviar {
+	grid-row: span 2;
 }
 div.menuEdicao_Figuras button img {
 	margin: -25px;
@@ -12,6 +17,13 @@ div.menuEdicao_Figuras button img {
 	height: 50px;
 	vertical-align: middle;
 }
+
+div.menuEdicao_Alturas {
+	display: inline-grid;
+	grid-template-columns: repeat(7,3em);
+	gap: 1px;
+}
+
 div.overlayEditor {
 	pointer-events: none;
 	position: absolute;

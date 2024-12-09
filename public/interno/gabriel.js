@@ -659,7 +659,7 @@ class Sistema {
 	atualizar() {
 		//console.log("Atualizar sistema");
 		if (this.el.offsetWidth != this.largura) {
-			console.log("Largura diferente!");
+			//console.log("Largura diferente!");
 			this.largura = this.el.offsetWidth;
 			this.compassos.forEach(compasso => {
 				compasso.atualizar();
@@ -765,7 +765,7 @@ function obterImagemFiguraDuracao(argDuracao) {
 		case 0.25: imagem = "Semicolcheia"; break;
 		case 0.125: imagem = "Fusa"; break;
 		case 0.0625: imagem = "Semifusa"; break;
-		default: console.log("Duração não-identificada: " + argDuracao);
+		default: throw new Error("Duração não-identificada: " + argDuracao);
 	}
 	return imagem;
 }

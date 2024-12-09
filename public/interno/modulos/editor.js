@@ -21,6 +21,7 @@ async function carregarModulo() {
 	atualizarEditor();
 	selecionarDuracao(Duracoes.COLCHEIA);
 	atualizarLoading(-1);
+	menuModulo.selecionar();
 	return true;
 }
 
@@ -31,6 +32,7 @@ var imgCursorEditor = document.createElement("img");
 imgCursorEditor.classList.add("cursor");
 imgCursorEditor.src="#";
 divEditor.appendChild(imgCursorEditor);
+
 
 var alturaCursor = 0;
 var cursorAdicionar = true;
@@ -66,9 +68,13 @@ function atualizarEditor() {
 	}
 }
 
-function adicionarFigura() {
+function adicionarFigura(argAltura = null) {
 	if (verificarEditorSelecionado()) {
 		if (duracaoSelecionada != null) {
+			if (argAltura != null) {
+				
+				atualizarEditor();
+			}
 			let alturaNota = obterNotaAltura(alturaCursor,elementoSelecionado.compasso.clave);
 			//console.log(alturaNota);
 			elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,false,alturaNota.nota,alturaNota.oitava);
@@ -167,6 +173,27 @@ document.body.addEventListener("keydown",(e)=>{
 			case "NumpadEnter":
 			case "Enter":
 				adicionarFigura();
+				break;
+			case "KeyA":
+				adicionarFigura(Alturas.LA);
+				break;
+			case "KeyB":
+				adicionarFigura(Alturas.SI);
+				break;
+			case "KeyC":
+				adicionarFigura(Alturas.DO);
+				break;
+			case "KeyD":
+				adicionarFigura(Alturas.RE);
+				break;
+			case "KeyE":
+				adicionarFigura(Alturas.MI);
+				break;
+			case "KeyF":
+				adicionarFigura(Alturas.FA);
+				break;
+			case "KeyG":
+				adicionarFigura(Alturas.SOL);
 				break;
 			case "ArrowRight": {
 				if (elementoSelecionado instanceof Divisao) {
