@@ -32,6 +32,16 @@ var imgCursorEditor = document.createElement("img");
 imgCursorEditor.classList.add("cursor");
 imgCursorEditor.src="#";
 divEditor.appendChild(imgCursorEditor);
+for (let i = -alturaLinhasOitavasPx * 2; i <= alturaLinhasOitavasPx * 2; i += alturaLinhasPautasPx) {
+	var divInserirNota = document.createElement("div");
+	divInserirNota.classList.add("inserirNota");
+	divInserirNota.style.height = alturaLinhasPautasPx + "px";
+	divInserirNota.addEventListener("click",(e)=>{
+		alturaCursor = i;
+		adicionarFigura(i);
+	});
+	divEditor.appendChild(divInserirNota);
+}
 
 
 var alturaCursor = 0;
@@ -71,13 +81,41 @@ function atualizarEditor() {
 function adicionarFigura(argAltura = null) {
 	if (verificarEditorSelecionado()) {
 		if (duracaoSelecionada != null) {
-			if (argAltura != null) {
-				
+			if (typeof argAltura == "string") {
+				let novaAltura = elementoSelecionado.compasso.alturaDo3Px;
+				switch (argAltura) {
+					case Alturas.SOL: novaAltura += alturaLinhasPautasPx * 3; break;
+					case Alturas.LA: novaAltura += alturaLinhasPautasPx * 2; break;
+					case Alturas.SI: novaAltura += alturaLinhasPautasPx; break;
+					case Alturas.DO: break;
+					case Alturas.RE: novaAltura -= alturaLinhasPautasPx; break;
+					case Alturas.MI: novaAltura -= alturaLinhasPautasPx * 2; break;
+					case Alturas.FA: novaAltura -= alturaLinhasPautasPx * 3; break;
+				}
+				//console.log(novaAltura - alturaCursor);
+				while (novaAltura - alturaCursor > alturaLinhasPautasPx * 3) {
+					//console.log("Muito longe pra baixo");
+					novaAltura -= alturaLinhasOitavasPx;
+				}
+				while (alturaCursor - novaAltura > alturaLinhasPautasPx * 3) {
+					//console.log("Muito longe pra cima");
+					novaAltura += alturaLinhasOitavasPx;
+				}
+				alturaCursor = novaAltura;
 				atualizarEditor();
 			}
 			let alturaNota = obterNotaAltura(alturaCursor,elementoSelecionado.compasso.clave);
 			//console.log(alturaNota);
-			elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,false,alturaNota.nota,alturaNota.oitava);
+			if (cursorAdicionar) {
+				elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,false,alturaNota.nota,alturaNota.oitava);
+				selecionarElemento(elementoSelecionado.obterDivisaoPosterior());
+			} else {
+				if (argAltura != null) {
+					elementoSelecionado.figuras[0].definirAltura(alturaNota.nota,alturaNota.oitava);
+				}
+				selecionarElemento(elementoSelecionado.obterDivisaoPosterior(false));
+			}
+			/*
 			if (elementoSelecionado.compasso.obterTemposDivisoes() == elementoSelecionado.compasso.andamento[0]) {
 				selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
 				if (elementoSelecionado.figuras.length > 0) {
@@ -91,7 +129,7 @@ function adicionarFigura(argAltura = null) {
 				}
 			} else {
 				selecionarElemento(elementoSelecionado.divisaoPosterior);
-			}
+			}*/
 			elementoSelecionado.el.scrollIntoView({
 				behavior: "smooth",
 				block: "center",
@@ -108,6 +146,64 @@ function subirAlturaCursor() {
 function descerAlturaCursor() {
 	alturaCursor += alturaLinhasPautasPx;
 	atualizarEditor();
+}
+function avancarDivisaoCursor() {
+	selecionarElemento(elementoSelecionado.obterDivisaoPosterior(false));
+	elementoSelecionado.el.scrollIntoView({
+		behavior: "smooth",
+		block: "center",
+		inline: "center"
+	});
+}
+function voltarDivisaoCursor() {
+	selecionarElemento(elementoSelecionado.obterDivisaoAnterior(false));
+	elementoSelecionado.el.scrollIntoView({
+		behavior: "smooth",
+		block: "center",
+		inline: "center"
+	});
+}
+function subirPautaCursor() {
+	let compassoAcima = elementoSelecionado.compasso.obterCompassoAcima();
+	if (compassoAcima != null) {
+		selecionarElemento(compassoAcima.obterPrimeiraDivisao(false));
+		elementoSelecionado.el.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center"
+		});
+	}
+}
+function descerPautaCursor() {
+	let compassoAbaixo = elementoSelecionado.compasso.obterCompassoAbaixo();
+	if (compassoAbaixo != null) {
+		selecionarElemento(compassoAbaixo.obterPrimeiraDivisao(false));
+		elementoSelecionado.el.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center"
+		});
+	}
+}
+function avancarCompassoCursor() {
+	if (elementoSelecionado.compasso.compassoPosterior != null) {
+		selecionarElemento(elementoSelecionado.compasso.compassoPosterior.obterPrimeiraDivisao(false));
+		elementoSelecionado.el.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center"
+		});
+	}
+}
+function voltarCompassoCursor() {
+	if (elementoSelecionado.compasso.compassoAnterior != null) {
+		selecionarElemento(elementoSelecionado.compasso.compassoAnterior.obterPrimeiraDivisao(false));
+		elementoSelecionado.el.scrollIntoView({
+			behavior: "smooth",
+			block: "center",
+			inline: "center"
+		});
+	}
 }
 //#endregion
 
@@ -198,59 +294,28 @@ document.body.addEventListener("keydown",(e)=>{
 			case "ArrowRight": {
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
-					if ((elementoSelecionado.divisaoPosterior!=null)
-					&& (!e.shiftKey)) {
-						selecionarElemento(elementoSelecionado.divisaoPosterior);
+					if (!e.shiftKey) {
+						avancarDivisaoCursor();
 					} else {
-						if (elementoSelecionado.compasso.compassoPosterior!=null) {
-							selecionarElemento(elementoSelecionado.compasso.compassoPosterior.divisoes[0]);
-						}
+						avancarCompassoCursor();
 					}
-					elementoSelecionado.el.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-						inline: "center"
-					});
 				}
 			} break;
 			case "ArrowLeft": {
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
-					if ((elementoSelecionado.divisaoAnterior!=null)
-					&& (!e.shiftKey)) {
-						selecionarElemento(elementoSelecionado.divisaoAnterior);
+					if (!e.shiftKey) {
+						voltarDivisaoCursor();
 					} else {
-						if (elementoSelecionado.compasso.compassoAnterior!=null) {
-							if (e.shiftKey) {
-								selecionarElemento(elementoSelecionado.compasso.compassoAnterior.divisoes[0]);
-							} else {
-								selecionarElemento(elementoSelecionado.compasso.compassoAnterior.obterUltimaDivisao());
-							}
-						}
+						voltarCompassoCursor();
 					}
-					elementoSelecionado.el.scrollIntoView({
-						behavior: "smooth",
-						block: "center",
-						inline: "center"
-					});
 				}
 			} break;
 			case "ArrowUp": {
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
 					if (e.shiftKey) {
-						if (elementoSelecionado.compasso.pauta.pautaAnterior!=null) {
-							selecionarElemento(elementoSelecionado.compasso.pauta.pautaAnterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
-						} else {
-							if (elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior!=null) {
-								selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoAnterior.obterUltimaPauta().compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
-							}
-						}
-						elementoSelecionado.el.scrollIntoView({
-							behavior: "smooth",
-							block: "center",
-							inline: "center"
-						});
+						subirPautaCursor();
 					} else {
 						if (cursorAdicionar) {
 							subirAlturaCursor();
@@ -264,18 +329,7 @@ document.body.addEventListener("keydown",(e)=>{
 				if (elementoSelecionado instanceof Divisao) {
 					e.preventDefault();
 					if (e.shiftKey) {
-						if (elementoSelecionado.compasso.pauta.pautaPosterior!=null) {
-							selecionarElemento(elementoSelecionado.compasso.pauta.pautaPosterior.compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
-						} else {
-							if (elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior!=null) {
-								selecionarElemento(elementoSelecionado.compasso.pauta.instrumento.instrumentoPosterior.pautas[0].compassos[elementoSelecionado.compasso.obterNumero()].divisoes[0]);
-							}
-						}
-						elementoSelecionado.el.scrollIntoView({
-							behavior: "smooth",
-							block: "center",
-							inline: "center"
-						});
+						descerPautaCursor();
 					} else {
 						if (cursorAdicionar) {
 							descerAlturaCursor();

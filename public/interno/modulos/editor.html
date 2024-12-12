@@ -1,22 +1,22 @@
 <div id="menuEdicao" class="menu">
 	<div class="menuEdicao_Alturas">
-		<button type="button" title="Dó">C</button>
-		<button type="button" title="Ré">D</button>
-		<button type="button" title="Mi">E</button>
-		<button type="button" title="Fá">F</button>
-		<button type="button" title="Sol">G</button>
-		<button type="button" title="Lá">A</button>
-		<button type="button" title="Si">B</button>
-		<button type="button" title="Compasso anterior">⇐</button>
-		<button type="button" title="Subir cursor">↑</button>
-		<button type="button" title="Compasso posterior">⇒</button>
-		<button type="button" title="Pauta acima">⇑</button>
+		<button type="button" title="Dó" onclick="adicionarFigura(Alturas.DO)">C</button>
+		<button type="button" title="Ré" onclick="adicionarFigura(Alturas.RE)">D</button>
+		<button type="button" title="Mi" onclick="adicionarFigura(Alturas.MI)">E</button>
+		<button type="button" title="Fá" onclick="adicionarFigura(Alturas.FA)">F</button>
+		<button type="button" title="Sol" onclick="adicionarFigura(Alturas.SOL)">G</button>
+		<button type="button" title="Lá" onclick="adicionarFigura(Alturas.LA)">A</button>
+		<button type="button" title="Si" onclick="adicionarFigura(Alturas.SI)">B</button>
+		<button type="button" title="Compasso anterior" onclick="voltarCompassoCursor()">⇐</button>
+		<button type="button" title="Subir cursor" onclick="subirAlturaCursor()">↑</button>
+		<button type="button" title="Compasso posterior" onclick="avancarCompassoCursor()">⇒</button>
+		<button type="button" title="Pauta acima" onclick="subirPautaCursor()">⇑</button>
 		<label for="menuEdicao_oitava" class="colspan2">Oitava:</label>
 		<input id="menuEdicao_oitava" type="number" value="3">
-		<button type="button" title="Divisão anterior">←</button>
-		<button type="button" title="Descer cursor">↓</button>
-		<button type="button" title="Divisão posterior">→</button>
-		<button type="button" title="Pauta abaixo">⇓</button>
+		<button type="button" title="Divisão anterior" onclick="voltarDivisaoCursor()">←</button>
+		<button type="button" title="Descer cursor" onclick="descerAlturaCursor()">↓</button>
+		<button type="button" title="Divisão posterior" onclick="avancarDivisaoCursor()">→</button>
+		<button type="button" title="Pauta abaixo" onclick="descerPautaCursor()">⇓</button>
 		<div></div>
 		<div></div>
 		<div></div>

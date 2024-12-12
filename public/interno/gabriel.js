@@ -244,6 +244,11 @@ class Figura {
 		}
 		this.atualizarElemento();
 	}
+	definirAltura(argAltura,argOitava) {
+		this.altura=argAltura;
+		this.oitava=argOitava;
+		this.atualizarElemento();
+	}
 }
 
 class Divisao {
@@ -297,6 +302,44 @@ class Divisao {
 	}
 	chamarAtualizacaoSistema() {
 		this.compasso.chamarAtualizacaoSistema();
+	}
+	obterDivisaoPosterior(argDivisaoVazia = true) {
+		if (this.divisaoPosterior != null) {
+			if (argDivisaoVazia) {
+				if (this.divisaoPosterior.figuras.length == 0) {
+					return this.divisaoPosterior;
+				} else {
+					return this.divisaoPosterior.obterDivisaoPosterior(argDivisaoVazia);
+				}
+			} else {
+				return this.divisaoPosterior;
+			}
+		} else {
+			if (this.compasso.compassoPosterior != null) {
+				return this.compasso.compassoPosterior.obterPrimeiraDivisao(argDivisaoVazia);
+			} else {
+				return null;
+			}
+		}
+	}
+	obterDivisaoAnterior(argDivisaoVazia = true) {
+		if (this.divisaoAnterior != null) {
+			if (argDivisaoVazia) {
+				if (this.divisaoAnterior.figuras.length == 0) {
+					return this.divisaoAnterior;
+				} else {
+					return this.divisaoAnterior.obterDivisaoAnterior(argDivisaoVazia);
+				}
+			} else {
+				return this.divisaoAnterior;
+			}
+		} else {
+			if (this.compasso.compassoAnterior != null) {
+				return this.compasso.compassoAnterior.obterUltimaDivisao(argDivisaoVazia);
+			} else {
+				return null;
+			}
+		}
 	}
 }
 
@@ -553,8 +596,28 @@ class Compasso {
 		//console.log("Obteve " + tempos);
 		return tempos;
 	}
-	obterUltimaDivisao() {
-		return this.divisoes[this.divisoes.length - 1];
+	obterPrimeiraDivisao(argDivisaoVazia = true) {
+		if (argDivisaoVazia) {
+			if (this.divisoes[0].figuras.length == 0) {
+				return this.divisoes[0];
+			} else {
+				return this.divisoes[0].obterDivisaoPosterior(argDivisaoVazia);
+			}
+		} else {
+			return this.divisoes[0];
+		}
+	}
+	obterUltimaDivisao(argDivisaoVazia = true) {
+		//console.log(argDivisaoVazia);
+		if (argDivisaoVazia) {
+			if (this.divisoes[this.divisoes.length - 1].figuras.length == 0) {
+				return this.divisoes[this.divisoes.length - 1];
+			} else {
+				return this.divisoes[this.divisoes.length - 1].obterDivisaoAnterior(argDivisaoVazia);
+			}
+		} else {
+			return this.divisoes[this.divisoes.length - 1];
+		}
 	}
 	obterNumero() {
 		let numero = 0;
@@ -565,6 +628,28 @@ class Compasso {
 			}
 		}
 		return numero;
+	}
+	obterCompassoAcima() {
+		if (this.pauta.pautaAnterior!=null) {
+			return this.pauta.pautaAnterior.compassos[this.obterNumero()];
+		} else {
+			if (this.pauta.instrumento.instrumentoAnterior!=null) {
+				return this.pauta.instrumento.instrumentoAnterior.obterUltimaPauta().compassos[this.obterNumero()];
+			} else {
+				return null;
+			}
+		}
+	}
+	obterCompassoAbaixo() {
+		if (this.pauta.pautaPosterior!=null) {
+			return this.pauta.pautaPosterior.compassos[this.obterNumero()];
+		} else {
+			if (this.pauta.instrumento.instrumentoPosterior!=null) {
+				return this.pauta.instrumento.instrumentoPosterior.pautas[0].compassos[this.obterNumero()];
+			} else {
+				return null;
+			}
+		}
 	}
 }
 
@@ -855,12 +940,16 @@ function obterAlturaAleatoria() {
 }
 
 function selecionarElemento(argElemento) {
-	if (elementoSelecionado!=null) {
-		elementoSelecionado.el.classList.remove("selecionado");
-	}
-	elementoSelecionado = argElemento;
-	if (elementoSelecionado!=null) {
-		elementoSelecionado.el.classList.add("selecionado");
+	if (argElemento!=null) {
+		if (elementoSelecionado!=null) {
+			elementoSelecionado.el.classList.remove("selecionado");
+		}
+		elementoSelecionado = argElemento;
+		if (elementoSelecionado!=null) {
+			elementoSelecionado.el.classList.add("selecionado");
+		}
+	} else {
+		console.log("Não há elemento para selecionar!");
 	}
 	//console.log("Elemento selecionado");
 	//console.log(argElemento);
