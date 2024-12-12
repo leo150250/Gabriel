@@ -22,7 +22,6 @@ async function carregarModulo() {
 	menuModulo = new Menu(nomeModulo,botaoModulo,divMenuEdicao,atualizarEditor);
 	divPartitura.appendChild(divEditor);
 	buttonPausa = document.getElementById("menuEdicao_botaoPausa");
-	console.log(buttonPausa);
 	atualizarEditor();
 	selecionarDuracao(Duracoes.COLCHEIA);
 	atualizarLoading(-1);
@@ -66,6 +65,7 @@ function verificarEditorSelecionado() {
 }
 
 function atualizarEditor() {
+	console.log("Atualizando editor");
 	divEditor.style.display="none";
 	if (verificarEditorSelecionado()) {
 		divEditor.style.display="flex";
@@ -73,7 +73,6 @@ function atualizarEditor() {
 		divEditor.style.top = (elementoSelecionado.el.offsetTop + elementoSelecionado.compasso.el.offsetTop) + "px";
 		divEditor.style.width = elementoSelecionado.el.offsetWidth + "px";
 		divEditor.style.height = elementoSelecionado.el.offsetHeight + "px";
-		imgCursorEditor.style.top = alturaCursor + "px";
 		if (elementoSelecionado.figuras.length>0) {
 			cursorAdicionar = false;
 			imgCursorEditor.style.display = "none";
@@ -82,17 +81,32 @@ function atualizarEditor() {
 			imgCursorEditor.style.display = "block";
 		}
 		if (!cursorAdicionar) {
-			selecionarDuracao(elementoSelecionado.figuras[0].figura);
+			selecionarDuracao(elementoSelecionado.figuras[0].figura, elementoSelecionado.figuras[0].pausa, false);
 		}
-	}
-	if (inserirPausa) {
-		buttonPausa.classList.add("selecionado");
-	} else {
-		buttonPausa.classList.remove("selecionado");
+		let nomeImagemCursor = obterImagemFiguraDuracao(duracaoSelecionada);
+		
+		if (inserirPausa) {
+			imgCursorEditor.style.top = "0px";
+			buttonPausa.classList.add("selecionado");
+			Object.keys(Duracoes).forEach(duracao => {
+				let nomeImagemFigura = "interno/imagens/figura" + duracao[0] + duracao.substring(1).toLowerCase() + "Pausa.svg";
+				document.getElementById("menuEdicao_botao" + duracao).children[0].src = nomeImagemFigura;
+			});
+			nomeImagemCursor += "Pausa";
+		} else {
+			imgCursorEditor.style.top = alturaCursor + "px";
+			buttonPausa.classList.remove("selecionado");
+			Object.keys(Duracoes).forEach(duracao => {
+				let nomeImagemFigura = "interno/imagens/figura" + duracao[0] + duracao.substring(1).toLowerCase() + ".svg";
+				document.getElementById("menuEdicao_botao" + duracao).children[0].src = nomeImagemFigura;
+			});
+		}
+		imgCursorEditor.src="interno/imagens/figura" + nomeImagemCursor + ".svg";
 	}
 }
 
 function adicionarFigura(argAltura = null) {
+	console.log("Adicionando figura " + argAltura);
 	if (verificarEditorSelecionado()) {
 		if (duracaoSelecionada != null) {
 			if (typeof argAltura == "string") {
@@ -121,7 +135,7 @@ function adicionarFigura(argAltura = null) {
 			let alturaNota = obterNotaAltura(alturaCursor,elementoSelecionado.compasso.clave);
 			//console.log(alturaNota);
 			if (cursorAdicionar) {
-				elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,false,alturaNota.nota,alturaNota.oitava);
+				elementoSelecionado.compasso.adicionarFigura(elementoSelecionado,duracaoSelecionada,inserirPausa,alturaNota.nota,alturaNota.oitava);
 				selecionarElemento(elementoSelecionado.obterDivisaoPosterior());
 			} else {
 				if (argAltura != null) {
@@ -231,6 +245,13 @@ function alternarPausa(argDefinicao = null) {
 	if (argDefinicao == null) {
 		alternarPausa(!inserirPausa);
 	} else {
+		if (verificarEditorSelecionado()) {
+			if (!cursorAdicionar) {
+				elementoSelecionado.figuras[0].pausa = argDefinicao;
+				elementoSelecionado.figuras[0].obterImagem();
+				elementoSelecionado.figuras[0].atualizarElemento();
+			}
+		}
 		inserirPausa = argDefinicao;
 	}
 	atualizarEditor();
@@ -243,10 +264,10 @@ function alternarPausa(argDefinicao = null) {
 //#region Funções GUI
 var menuEdicao_botaoSelecionado = "";
 var duracaoSelecionada = null;
-function selecionarDuracao(argDuracao) {
+function selecionarDuracao(argDuracao,argPausa = null, argReplicar = true) {
+	console.log("Selecionando duração: " + argDuracao);
 	const keys = Object.keys(Duracoes);
 	keys.forEach(chave => {
-		//console.log(chave);
 		if (argDuracao==Duracoes[chave]) {
 			if (menuEdicao_botaoSelecionado!="") {
 				document.getElementById("menuEdicao_botao"+menuEdicao_botaoSelecionado).classList.remove("selecionado");
@@ -254,12 +275,18 @@ function selecionarDuracao(argDuracao) {
 			menuEdicao_botaoSelecionado=chave;
 			duracaoSelecionada=argDuracao;
 			document.getElementById("menuEdicao_botao"+menuEdicao_botaoSelecionado).classList.add("selecionado");
-			imgCursorEditor.src="interno/imagens/figura" + obterImagemFiguraDuracao(duracaoSelecionada) + ".svg";
 		}
 	});
+	if (argPausa != null) {
+		inserirPausa = argPausa;
+	}
+	if (argReplicar) {
+		atualizarEditor();
+	}
 }
 var selecionarElemento_ = selecionarElemento;
 selecionarElemento = function(argElemento) {
+	console.log("Selecionando elemento");
 	selecionarElemento_.apply(this,arguments);
 	atualizarEditor();
 }
@@ -292,6 +319,9 @@ document.body.addEventListener("keydown",(e)=>{
 				break;
 			case "Numpad8":
 				selecionarDuracao(Duracoes.BREVE);
+				break;
+			case "Numpad0":
+				alternarPausa();
 				break;
 			case "Escape":
 				menuModulo.desselecionar();

@@ -121,6 +121,7 @@ class Figura {
 		//console.log(this.altura);
 		this.oitava = argOitava;
 		this.invertida = false;
+		this.pausa = argPausa;
 		this.alturaPx = this.obterAlturaNota();
 		//this.alturaPx = obterAlturaAleatoria();
 		this.el = document.createElement("img");
@@ -148,7 +149,6 @@ class Figura {
 	}
 	atualizarElemento(argReplicar=true) {
 		this.alturaPx = obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
-		this.el.style.top = this.alturaPx + "px";
 		if (this.sincopada!=null) {
 			this.invertida = this.sincopada.invertida;
 			if (argReplicar) {
@@ -157,8 +157,14 @@ class Figura {
 		} else {
 			this.invertida = (this.alturaPx < 0);
 		}
-		this.el.style.transform=this.invertida?"rotate(180deg)":"rotate(0deg)";
-		if ((this.alturaPx > alturaLinhasPautasPx * 5) || (this.alturaPx < alturaLinhasPautasPx * -5)) {
+		if (!this.pausa) {
+			this.el.style.transform=this.invertida?"rotate(180deg)":"rotate(0deg)";
+			this.el.style.top = this.alturaPx + "px";
+		} else {
+			this.el.style.transform="rotate(0deg)";
+			this.el.style.top = "0px";
+		}
+		if (((this.alturaPx > alturaLinhasPautasPx * 5) || (this.alturaPx < alturaLinhasPautasPx * -5)) && (!this.pausa)) {
 			this.el.style.backgroundImage="url('interno/imagens/linhasSuplementares.svg')";
 			this.el.style.backgroundPositionY=((this.alturaPx * (this.invertida?1:-1)) % (alturaLinhasPautasPx * 2)) + "px";
 			this.el.style.backgroundRepeat="no-repeat";
@@ -198,6 +204,9 @@ class Figura {
 	}
 	obterImagem() {
 		let imagem=obterImagemFiguraDuracao(this.figura);
+		if (this.pausa) {
+			imagem += "Pausa";
+		}
 		this.el.src="interno/imagens/figura" + imagem + ".svg";
 	}
 	obterAlturaNota() {
@@ -288,8 +297,8 @@ class Divisao {
 		this.atualizar();
 		return [this, novaDivisao];
 	}
-	adicionarFigura(argFigura,argAltura,argOitava) {
-		let novaFigura = new Figura(this,argFigura,argAltura,argOitava);
+	adicionarFigura(argFigura,argAltura,argOitava,argPausa = false) {
+		let novaFigura = new Figura(this,argFigura,argAltura,argOitava,argPausa);
 		//console.log("Figura adicionada");
 		return novaFigura;
 	}
@@ -577,7 +586,7 @@ class Compasso {
 				sobraFigura=argFigura - divisao.tempos;
 				argFigura=divisao.tempos;
 			}
-			let notaAdicionada = divisao.adicionarFigura(argFigura,argAltura,argOitava);
+			let notaAdicionada = divisao.adicionarFigura(argFigura,argAltura,argOitava,argPausa);
 			if (sobraFigura>0) {
 				notaAdicionada.definirSincopa(this.compassoPosterior.adicionarFigura(-1,sobraFigura,argPausa,argAltura,argOitava));
 			}

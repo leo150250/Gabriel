@@ -55,6 +55,9 @@ button:active {
     color: #FFF;
     background-color: var(--azul);
 }
+button img {
+    pointer-events: none;
+}
 label{
     padding: 10px;
     vertical-align: baseline;
