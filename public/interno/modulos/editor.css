@@ -1,13 +1,16 @@
 div.menuEdicao_Figuras {
 	display: inline-grid;
-	grid-template-columns: 3em 3em 3em 3em;
+	grid-template-columns: repeat(5, 3em);
 	gap: 1px;
 	margin-right: 1px;
 }
 div.menuEdicao_Figuras button {
 	overflow: hidden;
 }
-div.menuEdicao_Figuras button.botaoEnviar {
+div.menuEdicao_Figuras button.botaoPausa {
+	grid-column: span 2;
+}
+div.menuEdicao_Figuras button.botaoNota {
 	grid-row: span 2;
 }
 div.menuEdicao_Figuras button img {
