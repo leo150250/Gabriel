@@ -3,6 +3,16 @@
     --azulClaro: #bbd1ee;
     --azulSelecao: #5883bd40;
 }
+.colspan2 {
+    grid-column: span 2;
+}
+.rowspan2 {
+    grid-row: span 2;
+}
+.espacador {
+    margin-right: 1px;
+    flex-grow: 2;
+}
 html {
     width: 100%;
     height: 100%;
@@ -17,7 +27,7 @@ body {
     overflow: hidden;
 }
 
-button {
+button, input {
     outline: none;
     padding: 10px;
     border: none;
@@ -27,15 +37,34 @@ button {
     min-height: 3rem;
     min-width: 3rem;
     margin-right: 1px;
+    &[type="number"] {
+        border-bottom: 5px solid var(--azulClaro);
+        box-sizing: border-box;
+    }
 }
-button:hover {
+button:hover, input[type="number"]:hover {
     background-color: #EEE;
+}
+input[type="number"]:focus {
+    border-bottom: 5px solid var(--azul);
 }
 button.selecionado {
     background-color: var(--azulClaro);
 }
 button:active {
+    color: #FFF;
     background-color: var(--azul);
+}
+button img {
+    pointer-events: none;
+}
+label{
+    padding: 10px;
+    vertical-align: baseline;
+    align-self: center;
+}
+label:has(+input) {
+    text-align: right;
 }
 
 #loader {
@@ -64,6 +93,7 @@ button:active {
         }
     }
 }
+
 #wrapper {
     display: flex;
     flex-direction: column;
@@ -121,9 +151,12 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 }
 .barraMenu hr {
     margin: 0.5em;
+    border-color: #FFF;
+    opacity: 0.5;
 }
 .menu {
     display: flex;
+    width: 100%;
 }
 
 #menuBase > div:not(.exibir) {
@@ -224,7 +257,7 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 
 .divisao {
     min-height: 100px;
-    text-align: center;
+    text-align: left;
     min-width: 2em;
     position: relative;
     border-radius: 0.5em;

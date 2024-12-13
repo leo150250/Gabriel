@@ -4,7 +4,7 @@
    height="100"
    version="1.1"
    id="svg4"
-   sodipodi:docname="figuraMinima.svg"
+   sodipodi:docname="figuraColcheiaPausa.svg"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
@@ -23,11 +23,11 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="true"
      showguides="true"
-     inkscape:zoom="9.2999999"
-     inkscape:cx="53.602151"
-     inkscape:cy="33.27957"
+     inkscape:zoom="8"
+     inkscape:cx="47.1875"
+     inkscape:cy="47.1875"
      inkscape:window-width="1920"
-     inkscape:window-height="1057"
+     inkscape:window-height="1017"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
@@ -75,13 +75,30 @@
        id="guide246"
        inkscape:locked="false" />
   </sodipodi:namedview>
+  <g
+     id="g10"
+     transform="translate(14)">
+    <ellipse
+       style="fill:#000000;fill-rule:evenodd;stroke-linecap:square"
+       id="path7"
+       cx="33"
+       cy="47"
+       rx="4"
+       ry="3" />
+    <path
+       style="fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 40,44 -3,8 h 1 l 3,-8 z"
+       id="path8"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 33,50 c 3,0 6,0 6,-1 v -2 c 0,1 -1.977748,2.097075 -5,2 z"
+       id="path9"
+       sodipodi:nodetypes="ccccc" />
+  </g>
   <path
-     id="path6"
-     style="color:#000000;fill:#000000;fill-rule:evenodd;stroke-width:0.994962;stroke-linecap:round;stroke-linejoin:round;-inkscape-stroke:none"
-     d="m 51.490234,43.878906 c -0.481686,-0.0088 -0.980733,0.02292 -1.490234,0.0957 -2.038006,0.291144 -3.892374,1.203851 -5.255859,2.47461 -1.363488,1.270756 -2.242188,2.921878 -2.242188,4.621093 0,1.699217 0.8787,3.101232 2.242188,3.982422 1.363485,0.881191 3.217853,1.265752 5.255859,0.97461 2.038007,-0.291145 3.892374,-1.205804 5.255859,-2.476563 1.363488,-1.270756 2.242188,-2.92383 2.242188,-4.623047 0,-1.699215 -0.8787,-3.099278 -2.242188,-3.980468 -1.022614,-0.660894 -2.320563,-1.041933 -3.765625,-1.06836 z M 50.56875,44.390625 C 52.537792,44.288973 53.999774,46.252929 54,49 53.999799,52.050641 52.208997,54.971188 50,55.523438 47.791003,56.075686 46.000201,54.050541 46,51 c 2.01e-4,-3.050641 1.791003,-5.971188 4,-6.523438 0.190311,-0.04754 0.380377,-0.07626 0.56875,-0.08594 z"
-     sodipodi:nodetypes="ssssssssssccsccc" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:1.06719px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="M 57,49 V 8"
-     id="path2" />
+     style="fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+     d="m 51,52 -3,8 h 1 l 3,-8 z"
+     id="path10"
+     sodipodi:nodetypes="ccccc" />
 </svg>

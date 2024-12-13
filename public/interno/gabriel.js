@@ -3,6 +3,7 @@ const divPartitura = document.getElementById("partitura");
 const divMenuTopo = document.getElementById("menuTopo");
 const divMenuBase = document.getElementById("menuBase");
 const divLoader = document.getElementById("loader");
+const pLoader = document.getElementById("loaderTexto");
 const divMenuPrincipal = document.getElementById("menuPrincipal");
 const alturaCompassosPx = 150;
 const alturaLinhasPautasPx = 6;
@@ -73,7 +74,7 @@ const AlturasPx = {
 
 //#region Classes
 class Menu {
-	constructor(argNome,argTextoBotao,argElementoMenu) {
+	constructor(argNome,argTextoBotao,argElementoMenu,argFuncaoCallback = null) {
 		this.selecionado = false;
 		this.elementoMenu = argElementoMenu;
 		this.botao = document.createElement("button");
@@ -81,22 +82,32 @@ class Menu {
 		this.botao.title = argNome;
 		this.botao.onclick = ()=>{
 			exibirMenu(this);
+			this.botao.blur();
 		}
-		
+		this.funcaoCallback = argFuncaoCallback;
 		divMenuBase.appendChild(this.elementoMenu);
 		divMenuTopo.appendChild(this.botao);
-
 		menus.push(this);
 	}
 	selecionar() {
-		this.selecionado = true;
-		this.elementoMenu.classList.add("exibir");
-		this.botao.classList.add("selecionado");
+		if (!this.selecionado) {
+			this.selecionado = true;
+			this.elementoMenu.classList.add("exibir");
+			this.botao.classList.add("selecionado");
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
 	}
 	desselecionar() {
-		this.selecionado = false;
-		this.elementoMenu.classList.remove("exibir");
-		this.botao.classList.remove("selecionado");
+		if (this.selecionado) {
+			this.selecionado = false;
+			this.elementoMenu.classList.remove("exibir");
+			this.botao.classList.remove("selecionado");
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
 	}
 }
 
@@ -107,8 +118,11 @@ class Figura {
 		this.sincopa = null;
 		this.sincopada = null;
 		this.altura = argAltura;
+		//console.log(this.altura);
+		this.oitava = argOitava;
 		this.invertida = false;
-		this.alturaPx = this.divisao.compasso.pauta.alturaDo3Px;
+		this.pausa = argPausa;
+		this.alturaPx = this.obterAlturaNota();
 		//this.alturaPx = obterAlturaAleatoria();
 		this.el = document.createElement("img");
 		this.el.classList.add("figura");
@@ -129,8 +143,12 @@ class Figura {
 		this.divisao.el.appendChild(this.el_sincopa);
 		this.atualizarElemento();
 	}
+	atualizar() {
+		this.atualizarElemento();
+		this.divisao.chamarAtualizacaoSistema();
+	}
 	atualizarElemento(argReplicar=true) {
-		this.el.style.top = this.alturaPx + "px";
+		this.alturaPx = obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
 		if (this.sincopada!=null) {
 			this.invertida = this.sincopada.invertida;
 			if (argReplicar) {
@@ -139,8 +157,14 @@ class Figura {
 		} else {
 			this.invertida = (this.alturaPx < 0);
 		}
-		this.el.style.transform=this.invertida?"rotate(180deg)":"rotate(0deg)";
-		if ((this.alturaPx > alturaLinhasPautasPx * 5) || (this.alturaPx < alturaLinhasPautasPx * -5)) {
+		if (!this.pausa) {
+			this.el.style.transform=this.invertida?"rotate(180deg)":"rotate(0deg)";
+			this.el.style.top = this.alturaPx + "px";
+		} else {
+			this.el.style.transform="rotate(0deg)";
+			this.el.style.top = "0px";
+		}
+		if (((this.alturaPx > alturaLinhasPautasPx * 5) || (this.alturaPx < alturaLinhasPautasPx * -5)) && (!this.pausa)) {
 			this.el.style.backgroundImage="url('interno/imagens/linhasSuplementares.svg')";
 			this.el.style.backgroundPositionY=((this.alturaPx * (this.invertida?1:-1)) % (alturaLinhasPautasPx * 2)) + "px";
 			this.el.style.backgroundRepeat="no-repeat";
@@ -148,11 +172,11 @@ class Figura {
 			this.el.style.backgroundImage="none";
 		}
 		if (this.divisao.tempos!=this.figura) {
-			console.log("Atualizar imagem");
+			//console.log("Atualizar imagem");
 			this.obterImagem();
 		}
 		if (this.sincopa!=null) {
-			console.log("Atualizar síncopa");
+			//console.log("Atualizar síncopa");
 
 			let calculoLarguraPx = ((parseInt(this.sincopa.el.x) - parseInt(this.el.x) - 10) / (window.devicePixelRatio));
 			//console.log(this.sincopa.el.x + " - " + this.el.x + " = " + calculoLarguraPx);
@@ -179,18 +203,14 @@ class Figura {
 		}
 	}
 	obterImagem() {
-		let imagem="";
-		switch (this.figura) {
-			case 4: imagem = "Semibreve"; break;
-			case 2: imagem = "Minima"; break;
-			case 1: imagem = "Seminima"; break;
-			case 0.5: imagem = "Colcheia"; break;
+		let imagem=obterImagemFiguraDuracao(this.figura);
+		if (this.pausa) {
+			imagem += "Pausa";
 		}
-		if (imagem!="") {
-			this.el.src="interno/imagens/figura" + imagem + ".svg";
-		} else {
-			console.log("Imagem diferente: " + imagem);
-		}
+		this.el.src="interno/imagens/figura" + imagem + ".svg";
+	}
+	obterAlturaNota() {
+		return obterAlturaNota(this.altura,this.oitava,this.divisao.compasso.clave);
 	}
 	definirSincopa(argDestino=null) {
 		if (argDestino==null) {
@@ -210,20 +230,47 @@ class Figura {
 		}
 	}
 	subirAltura() {
-		this.alturaPx -= alturaLinhasPautasPx;
+		switch (this.altura) {
+			case Alturas.DO: this.altura = Alturas.RE; break;
+			case Alturas.RE: this.altura = Alturas.MI; break;
+			case Alturas.MI: this.altura = Alturas.FA; break;
+			case Alturas.FA: this.altura = Alturas.SOL; break;
+			case Alturas.SOL: this.altura = Alturas.LA; break;
+			case Alturas.LA: this.altura = Alturas.SI; break;
+			case Alturas.SI: this.altura = Alturas.DO; this.oitava++; break;
+		}
 		this.atualizarElemento();
 	}
 	descerAltura() {
-		this.alturaPx += alturaLinhasPautasPx;
+		switch (this.altura) {
+			case Alturas.DO: this.altura = Alturas.SI; this.oitava--; break;
+			case Alturas.RE: this.altura = Alturas.DO; break;
+			case Alturas.MI: this.altura = Alturas.RE; break;
+			case Alturas.FA: this.altura = Alturas.MI; break;
+			case Alturas.SOL: this.altura = Alturas.FA; break;
+			case Alturas.LA: this.altura = Alturas.SOL; break;
+			case Alturas.SI: this.altura = Alturas.LA; break;
+		}
+		this.atualizarElemento();
+	}
+	definirAltura(argAltura,argOitava) {
+		this.altura=argAltura;
+		this.oitava=argOitava;
 		this.atualizarElemento();
 	}
 }
 
 class Divisao {
-	constructor(argCompasso,argTempos = 4) {
+	constructor(argCompasso,argTempos = 4,argDivisaoAnterior = null) {
 		this.compasso = argCompasso;
+		//console.log(this.compasso);
 		this.tempos = argTempos;
 		this.figuras = [];
+		this.divisaoAnterior = argDivisaoAnterior;
+		this.divisaoPosterior = null;
+		if (this.divisaoAnterior != null) {
+			this.divisaoAnterior.divisaoPosterior = this;
+		}
 		this.el = document.createElement("div");
 		this.el.classList.add("divisao");
 		this.el.addEventListener("click",(e)=>{
@@ -244,23 +291,71 @@ class Divisao {
 		if (novosTempos>0) {
 			//console.log("Sobrou " + novosTempos + " tempos");
 			novaDivisao = this.compasso.adicionarDivisao(novosTempos);
+			this.divisaoPosterior = novaDivisao;
+			novaDivisao.divisaoAnterior = this;
 		}
 		this.atualizar();
 		return [this, novaDivisao];
 	}
-	adicionarFigura(argFigura,argAltura,argOitava) {
-		let novaFigura = new Figura(this,argFigura,argAltura,argOitava);
+	adicionarFigura(argFigura,argAltura,argOitava,argPausa = false) {
+		let novaFigura = new Figura(this,argFigura,argAltura,argOitava,argPausa);
 		//console.log("Figura adicionada");
 		return novaFigura;
 	}
 	atualizar() {
 		this.el.style.flexBasis = ((this.tempos / this.compasso.andamento[0]) * 100) + "%";
+		this.figuras.forEach(figura => {
+			figura.atualizar();
+		});
+		this.chamarAtualizacaoSistema();
+	}
+	chamarAtualizacaoSistema() {
+		this.compasso.chamarAtualizacaoSistema();
+	}
+	obterDivisaoPosterior(argDivisaoVazia = true) {
+		if (this.divisaoPosterior != null) {
+			if (argDivisaoVazia) {
+				if (this.divisaoPosterior.figuras.length == 0) {
+					return this.divisaoPosterior;
+				} else {
+					return this.divisaoPosterior.obterDivisaoPosterior(argDivisaoVazia);
+				}
+			} else {
+				return this.divisaoPosterior;
+			}
+		} else {
+			if (this.compasso.compassoPosterior != null) {
+				return this.compasso.compassoPosterior.obterPrimeiraDivisao(argDivisaoVazia);
+			} else {
+				return null;
+			}
+		}
+	}
+	obterDivisaoAnterior(argDivisaoVazia = true) {
+		if (this.divisaoAnterior != null) {
+			if (argDivisaoVazia) {
+				if (this.divisaoAnterior.figuras.length == 0) {
+					return this.divisaoAnterior;
+				} else {
+					return this.divisaoAnterior.obterDivisaoAnterior(argDivisaoVazia);
+				}
+			} else {
+				return this.divisaoAnterior;
+			}
+		} else {
+			if (this.compasso.compassoAnterior != null) {
+				return this.compasso.compassoAnterior.obterUltimaDivisao(argDivisaoVazia);
+			} else {
+				return null;
+			}
+		}
 	}
 }
 
 class Compasso {
-	constructor(argPauta,argCompassoAnterior = null) {
+	constructor(argPauta,argCompassoAnterior = null,argSistema = null) {
 		this.pauta = argPauta;
+		this.sistema = argSistema;
 		this.compassoAnterior = argCompassoAnterior;
 		this.compassoPosterior = null;
 		this.clave = this.pauta.clavePadrao;
@@ -272,6 +367,12 @@ class Compasso {
 			this.tom = this.compassoAnterior.tom;
 			this.andamento = this.compassoAnterior.andamento;
 			this.compassoAnterior.compassoPosterior = this;
+		}
+		this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx;
+		switch (this.clave) {
+			case Claves.SOL: this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx; break;
+			case Claves.FA: this.alturaDo3Px = AlturasPx.ESPACO2 - alturaLinhasOitavasPx; break;
+			case Claves.DO: this.alturaDo3Px = AlturasPx.LINHA3; break;
 		}
 		this.barraEsquerda = Barras.SIMPLES;
 		this.barraDireita = Barras.SIMPLES;
@@ -371,6 +472,14 @@ class Compasso {
 		if (this.compassoPosterior==null) {
 			this.atualizarBarraDireita(Barras.FIM);
 		}
+		this.divisoes.forEach(divisao => {
+			divisao.atualizar();
+		});
+	}
+	chamarAtualizacaoSistema() {
+		if (this.sistema != null) {
+			this.sistema.atualizar();
+		}
 	}
 	atualizarBarraEsquerda(argBarra = Barras.NENHUMA) {
 		this.barraEsquerda=argBarra;
@@ -455,13 +564,17 @@ class Compasso {
 		let novaDivisao = new Divisao(this,argTempos);
 		return novaDivisao;
 	}
-	adicionarFigura(argDivisao,argFigura,argPausa = false) {
+	adicionarFigura(argDivisao,argFigura,argPausa = false,argAltura = Alturas.DO,argOitava = 4) {
 		let divisao = null;
 		let sobraFigura = 0;
 		if (argDivisao == -1) {
 			divisao = this.divisoes[this.divisoes.length-1];
 		} else {
-			divisao = this.divisoes[argDivisao];
+			if (typeof argDivisao == "number") {
+				divisao = this.divisoes[argDivisao];
+			} else if (argDivisao instanceof Divisao) {
+				divisao = argDivisao;
+			}
 		}
 		if (this.obterTemposDivisoes() < this.andamento[0]) {
 			if (divisao.tempos > argFigura) {
@@ -473,13 +586,13 @@ class Compasso {
 				sobraFigura=argFigura - divisao.tempos;
 				argFigura=divisao.tempos;
 			}
-			let notaAdicionada = divisao.adicionarFigura(argFigura,Alturas.DO,4);
+			let notaAdicionada = divisao.adicionarFigura(argFigura,argAltura,argOitava,argPausa);
 			if (sobraFigura>0) {
-				notaAdicionada.definirSincopa(this.compassoPosterior.adicionarFigura(-1,sobraFigura,argPausa));
+				notaAdicionada.definirSincopa(this.compassoPosterior.adicionarFigura(-1,sobraFigura,argPausa,argAltura,argOitava));
 			}
 			return notaAdicionada;
 		} else {
-			return this.compassoPosterior.adicionarFigura(-1,argFigura,argPausa);
+			return this.compassoPosterior.adicionarFigura(-1,argFigura,argPausa,argAltura,argOitava);
 		}
 	}
 	obterTemposDivisoes() {
@@ -492,13 +605,73 @@ class Compasso {
 		//console.log("Obteve " + tempos);
 		return tempos;
 	}
+	obterPrimeiraDivisao(argDivisaoVazia = true) {
+		if (argDivisaoVazia) {
+			if (this.divisoes[0].figuras.length == 0) {
+				return this.divisoes[0];
+			} else {
+				return this.divisoes[0].obterDivisaoPosterior(argDivisaoVazia);
+			}
+		} else {
+			return this.divisoes[0];
+		}
+	}
+	obterUltimaDivisao(argDivisaoVazia = true) {
+		//console.log(argDivisaoVazia);
+		if (argDivisaoVazia) {
+			if (this.divisoes[this.divisoes.length - 1].figuras.length == 0) {
+				return this.divisoes[this.divisoes.length - 1];
+			} else {
+				return this.divisoes[this.divisoes.length - 1].obterDivisaoAnterior(argDivisaoVazia);
+			}
+		} else {
+			return this.divisoes[this.divisoes.length - 1];
+		}
+	}
+	obterNumero() {
+		let numero = 0;
+		for (let i = 0; i < this.pauta.compassos.length; i++) {
+			if (this.pauta.compassos[i] == this) {
+				numero = i;
+				break;
+			}
+		}
+		return numero;
+	}
+	obterCompassoAcima() {
+		if (this.pauta.pautaAnterior!=null) {
+			return this.pauta.pautaAnterior.compassos[this.obterNumero()];
+		} else {
+			if (this.pauta.instrumento.instrumentoAnterior!=null) {
+				return this.pauta.instrumento.instrumentoAnterior.obterUltimaPauta().compassos[this.obterNumero()];
+			} else {
+				return null;
+			}
+		}
+	}
+	obterCompassoAbaixo() {
+		if (this.pauta.pautaPosterior!=null) {
+			return this.pauta.pautaPosterior.compassos[this.obterNumero()];
+		} else {
+			if (this.pauta.instrumento.instrumentoPosterior!=null) {
+				return this.pauta.instrumento.instrumentoPosterior.pautas[0].compassos[this.obterNumero()];
+			} else {
+				return null;
+			}
+		}
+	}
 }
 
 class Pauta {
-	constructor(argInstrumento,argClavePadrao) {
+	constructor(argInstrumento,argClavePadrao,argPautaAnterior = null) {
 		this.instrumento = argInstrumento;
 		this.clavePadrao = argClavePadrao;
 		this.compassos = [];
+		this.pautaAnterior = argPautaAnterior;
+		this.pautaPosterior = null;
+		if (this.pautaAnterior != null) {
+			this.pautaAnterior.pautaPosterior = this;
+		}
 		for (let i = 0; i < numCompassos; i++) {
 			if (i > 0) {
 				this.compassos.push(new Compasso(this,this.compassos[i-1]));
@@ -506,13 +679,10 @@ class Pauta {
 				this.compassos.push(new Compasso(this));
 			}
 		}
-		this.alturaDo3Px = AlturasPx.ESPACO3 + alturaLinhasOitavasPx;
 	}
-
 	definirInstrumento(argInstrumento) {
 		this.instrumento = argInstrumento;
 	}
-
 	desenhar() {
 		for (let i = 0; i < numCompassos; i++) {
 			sistemas[i].el.appendChild(this.compassos[i].el);
@@ -523,16 +693,30 @@ class Pauta {
 }
 
 class Instrumento {
-	constructor(argNome,argAbrev,argPautas=[]) {
+	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null) {
 		this.nome = "";
 		this.abreviatura = "";
 		this.el_nome = document.createElement("div");
 		this.atualizarNome(argNome, argAbrev);
 		this.pautas = [];
 		this.transposicao = 0;
-		argPautas.forEach(pauta => {
-			this.adicionarPauta(pauta);
-		});
+		this.instrumentoAnterior = argInstrumentoAnterior;
+		this.instrumentoPosterior = null;
+		if (this.instrumentoAnterior != null) {
+			//console.log(argInstrumentoAnterior);
+			this.instrumentoAnterior.instrumentoPosterior = this;
+		}
+		for (let i = 0; i < argPautas.length; i++) {
+			if (i > 0) {
+				//console.log(argPautas[i]);
+				this.adicionarPauta(argPautas[i],this.pautas[i-1]);
+			} else {
+				this.adicionarPauta(argPautas[i]);
+			}
+		}
+		//argPautas.forEach(pauta => {
+		//	this.adicionarPauta(pauta);
+		//});
 		new Parte(this.nome,[this]);
 		instrumentos.push(this);
 	}
@@ -543,14 +727,18 @@ class Instrumento {
 			this.el_nome.innerHTML = this.nome;
 		}
 	}
-	adicionarPauta(argPauta) {
-		let novaPauta = new Pauta(this,argPauta);
+	adicionarPauta(argPauta,argPautaAnterior=null) {
+		let novaPauta = new Pauta(this,argPauta,argPautaAnterior);
 		this.pautas.push(novaPauta);
+		return novaPauta;
 	}
 	desenhar() {
 		this.pautas.forEach(pauta => {
 			pauta.desenhar();
 		})
+	}
+	obterUltimaPauta() {
+		return this.pautas[this.pautas.length - 1];
 	}
 }
 
@@ -560,6 +748,17 @@ class Sistema {
 		this.el.classList.add("sistema");
 		this.compassos = [];
 		sistemas.push(this);
+		this.largura = this.el.offsetWidth;
+	}
+	atualizar() {
+		//console.log("Atualizar sistema");
+		if (this.el.offsetWidth != this.largura) {
+			//console.log("Largura diferente!");
+			this.largura = this.el.offsetWidth;
+			this.compassos.forEach(compasso => {
+				compasso.atualizar();
+			});
+		}
 	}
 }
 
@@ -616,7 +815,12 @@ function criarInstrumentoPadrao(tipo) {
         default:
             throw new Error('Tipo de instrumento padrão desconhecido');
     }
-    const novoInstrumento = new Instrumento(tipo, abreviatura, pautas);
+	var novoInstrumento;
+	if (instrumentos.length == 0) {
+    	novoInstrumento = new Instrumento(tipo, abreviatura, pautas);
+	} else {
+		novoInstrumento = new Instrumento(tipo, abreviatura, pautas, instrumentos[instrumentos.length - 1]);
+	}
     return novoInstrumento;
 }
 
@@ -642,6 +846,69 @@ function renderizarPartitura() {
 			compasso.atualizar();
 		})
 	});
+}
+
+function obterImagemFiguraDuracao(argDuracao) {
+	let imagem = "";
+	switch (argDuracao) {
+		case 8: imagem = "Breve"; break;
+		case 4: imagem = "Semibreve"; break;
+		case 2: imagem = "Minima"; break;
+		case 1: imagem = "Seminima"; break;
+		case 0.5: imagem = "Colcheia"; break;
+		case 0.25: imagem = "Semicolcheia"; break;
+		case 0.125: imagem = "Fusa"; break;
+		case 0.0625: imagem = "Semifusa"; break;
+		default: throw new Error("Duração não-identificada: " + argDuracao);
+	}
+	return imagem;
+}
+
+function obterNotaAltura(argAlturaPx,argClave) {
+	let alturaNota = null;
+	let alturaOitava = 0;
+	let nota = null;
+	switch (argClave) {
+		case Claves.DO:
+			alturaNota = (((-argAlturaPx % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor(-argAlturaPx / alturaLinhasOitavasPx) + 3;
+			break;
+		case Claves.SOL:
+			alturaNota=((((-argAlturaPx + (alturaLinhasPautasPx * 6)) % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor((-argAlturaPx + (alturaLinhasPautasPx * 6)) / alturaLinhasOitavasPx) + 3;
+			break;
+		case Claves.FA:
+			alturaNota=((((-argAlturaPx + (alturaLinhasPautasPx)) % alturaLinhasOitavasPx) / alturaLinhasPautasPx) + 7) % 7;
+			alturaOitava = Math.floor((-argAlturaPx + (alturaLinhasPautasPx)) / alturaLinhasOitavasPx) + 2;
+			break;
+	}
+	nota = Alturas[Object.keys(Alturas)[alturaNota]];
+	return {
+		nota:nota,
+		oitava:alturaOitava
+	}
+}
+function obterAlturaNota(argNota,argOitava,argClave) {
+	let alturaPx = 0;
+	let alturaNota = null;
+	switch (argClave) {
+		case Claves.SOL: alturaPx = AlturasPx.ESPACO3 + alturaLinhasOitavasPx; break;
+		case Claves.FA: alturaPx = AlturasPx.ESPACO2 - alturaLinhasOitavasPx; break;
+		case Claves.DO: alturaPx = AlturasPx.LINHA3; break;
+	}
+	switch (argNota) {
+		case Alturas.DO: alturaPx -= alturaLinhasPautasPx * 0; break;
+		case Alturas.RE: alturaPx -= alturaLinhasPautasPx * 1; break;
+		case Alturas.MI: alturaPx -= alturaLinhasPautasPx * 2; break;
+		case Alturas.FA: alturaPx -= alturaLinhasPautasPx * 3; break;
+		case Alturas.SOL: alturaPx -= alturaLinhasPautasPx * 4; break;
+		case Alturas.LA: alturaPx -= alturaLinhasPautasPx * 5; break;
+		case Alturas.SI: alturaPx -= alturaLinhasPautasPx * 6; break;
+	}
+	alturaPx -= alturaLinhasOitavasPx * (argOitava - 3);
+	//console.log(indiceAltura);
+	//console.log(alturaPx);
+	return alturaPx;
 }
 
 function testarPartitura() {
@@ -679,16 +946,22 @@ function obterAlturaAleatoria() {
 	//console.log(AlturasPx[randomKey]);
     //return { [randomKey]: AlturasPx[randomKey] }; // Retorna a chave e o valor correspondente
 	return AlturasPx[randomKey];
-};
+}
 
 function selecionarElemento(argElemento) {
-	if (elementoSelecionado!=null) {
-		elementoSelecionado.el.classList.remove("selecionado");
+	if (argElemento!=null) {
+		if (elementoSelecionado!=null) {
+			elementoSelecionado.el.classList.remove("selecionado");
+		}
+		elementoSelecionado = argElemento;
+		if (elementoSelecionado!=null) {
+			elementoSelecionado.el.classList.add("selecionado");
+		}
+	} else {
+		console.log("Não há elemento para selecionar!");
 	}
-	elementoSelecionado = argElemento;
-	if (elementoSelecionado!=null) {
-		elementoSelecionado.el.classList.add("selecionado");
-	}
+	//console.log("Elemento selecionado");
+	//console.log(argElemento);
 }
 
 async function carregarPagina(argPagina) {
@@ -712,10 +985,14 @@ async function importarModulo(argModulo) {
 }
 
 function exibirMenu(argMenu) {
-	menus.forEach(menu => {
-		menu.desselecionar();
-	});
-	argMenu.selecionar();
+	if (argMenu.selecionado) {
+		argMenu.desselecionar();
+	} else {
+		menus.forEach(menu => {
+			menu.desselecionar();
+		});
+		argMenu.selecionar();
+	}
 }
 
 function exibirMenuPrincipal() {
@@ -730,6 +1007,9 @@ function atualizarLoading(argContador=0) {
 	} else {
 		//console.log("LOADING " + indiceCarregamento);
 	}
+}
+function textoLoading(argTexto) {
+	pLoader.innerHTML = argTexto;
 }
 //#endregion
 
@@ -758,6 +1038,14 @@ document.body.addEventListener("keydown",(e)=>{
 document.body.onload = (e)=>{
 	atualizarLoading(-1);
 };
+document.addEventListener('error', function(event) {
+	textoLoading("ERRO: " + event.message);
+    console.log('Captured error:', event.message);
+    console.log('Source:', event.filename);
+    console.log('Line:', event.lineno);
+    console.log('Column:', event.colno);
+    console.log('Error object:', event.error);
+},true);
 //#endregion
 
 
