@@ -27,7 +27,7 @@ body {
     overflow: hidden;
 }
 
-button, input {
+button, input[type="number"] {
     outline: none;
     padding: 10px;
     border: none;
@@ -55,6 +55,14 @@ button:active {
     color: #FFF;
     background-color: var(--azul);
 }
+button.estreito {
+    padding: 5px;
+    min-height: 1rem;
+    min-width: 1rem;
+}
+button.ok {
+    border: 2px solid var(--azul);
+}
 button img {
     pointer-events: none;
 }
@@ -65,6 +73,63 @@ label{
 }
 label:has(+input) {
     text-align: right;
+}
+h1, h2, h3, h4, h5, h6 {
+    margin: 0em;
+    padding: 0.5em 0.5em;
+}
+dialog {
+    border: none;
+    box-shadow: 0px 4px 8px #0004;
+    border-radius: 4px;
+    padding: 0em;
+    outline: none;
+}
+dialog::backdrop {
+    background-color: var(--azulSelecao);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+dialog h1 {
+    background-color: var(--azul);
+    color: #FFF;
+}
+dialog table {
+    width: 100%;
+}
+dialog .botoes {
+    background-color: #EEE;
+    border-top: 1px solid #CCC;
+    display: flex;
+    flex-direction: row-reverse;
+}
+dialog div.listagem {
+    display: flex;
+    width: calc(100vw - 5em);
+    height: calc(100vh - 20em);
+}
+
+table {
+    display: block;
+    overflow-y: scroll;
+    height: 20em;
+    position: relative;
+    border-spacing: 0px;
+    border-bottom: 1px solid var(--azul);
+}
+table tr.sticky {
+    position: sticky;
+    top: 0px;
+}
+table th {
+    background-color: #DDD;
+    min-width: 2em;
+    padding: 0.5em;
+}
+table td {
+    padding: 0.5em;
+    border-bottom: 1px solid #DDD;
+    box-sizing: border-box;
 }
 
 #loader {

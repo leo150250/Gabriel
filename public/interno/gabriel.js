@@ -18,6 +18,7 @@ var andamento = [4,4];
 var tom = 0;
 var elementoSelecionado = null;
 var menus = [];
+var dialogos = [];
 var indiceCarregamento = 1;
 //#endregion
 
@@ -73,6 +74,40 @@ const AlturasPx = {
 
 
 //#region Classes
+class Dialogo {
+	constructor(argNome,argTextoBotao,argElementoDialogo,argFuncaoCallback = null) {
+		this.selecionado = false;
+		this.elementoDialogo = argElementoDialogo;
+		this.botao = document.createElement("button");
+		this.botao.innerHTMl = argTextoBotao;
+		this.botao.title = argNome;
+		this.botao.onclick = ()=>{
+			exibirDialogo(this);
+			this.botao.blur();
+		}
+		this.funcaoCallback = argFuncaoCallback;
+		document.body.appendChild(this.elementoDialogo);
+		dialogos.push(this);
+	}
+	selecionar() {
+		if (!this.selecionado) {
+			this.selecionado = true;
+			this.elementoDialogo.showModal();
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
+	}
+	desselecionar() {
+		if (this.selecionado) {
+			this.selecionado = false;
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
+	}
+}
+
 class Menu {
 	constructor(argNome,argTextoBotao,argElementoMenu,argFuncaoCallback = null) {
 		this.selecionado = false;
@@ -1045,7 +1080,7 @@ document.addEventListener('error', function(event) {
     console.log('Line:', event.lineno);
     console.log('Column:', event.colno);
     console.log('Error object:', event.error);
-},true);
+});
 //#endregion
 
 
@@ -1053,3 +1088,4 @@ document.addEventListener('error', function(event) {
 
 testarPartitura();
 importarModulo("editor");
+importarModulo("instrumentos");
