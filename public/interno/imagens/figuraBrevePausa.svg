@@ -4,15 +4,14 @@
    height="100"
    version="1.1"
    id="svg4"
-   sodipodi:docname="figuraSeminima.svg"
+   sodipodi:docname="figuraBrevePausa.svg"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xml:space="preserve"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
-   xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs8" />
-  <sodipodi:namedview
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs8" /><sodipodi:namedview
      id="namedview6"
      pagecolor="#ffffff"
      bordercolor="#666666"
@@ -23,28 +22,25 @@
      inkscape:deskcolor="#d1d1d1"
      showgrid="true"
      showguides="true"
-     inkscape:zoom="13.152186"
-     inkscape:cx="61.776803"
-     inkscape:cy="36.381785"
+     inkscape:zoom="8.0000001"
+     inkscape:cx="49.562499"
+     inkscape:cy="55.062499"
      inkscape:window-width="1920"
-     inkscape:window-height="1057"
+     inkscape:window-height="1017"
      inkscape:window-x="1912"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg4">
-    <sodipodi:guide
+     inkscape:current-layer="svg4"><sodipodi:guide
        position="50,50"
        orientation="0,1"
        id="guide545"
        inkscape:locked="false"
        inkscape:label=""
-       inkscape:color="rgb(0,134,229)" />
-    <sodipodi:guide
+       inkscape:color="rgb(0,134,229)" /><sodipodi:guide
        position="50,50"
        orientation="1,0"
        id="guide547"
-       inkscape:locked="false" />
-    <inkscape:grid
+       inkscape:locked="false" /><inkscape:grid
        type="xygrid"
        id="grid549"
        empspacing="4"
@@ -53,38 +49,26 @@
        spacingy="1"
        spacingx="1"
        units="px"
-       visible="true" />
-    <sodipodi:guide
+       visible="true" /><sodipodi:guide
        position="0,62"
        orientation="0,-1"
        id="guide240"
-       inkscape:locked="false" />
-    <sodipodi:guide
+       inkscape:locked="false" /><sodipodi:guide
        position="0,74"
        orientation="0,-1"
        id="guide242"
-       inkscape:locked="false" />
-    <sodipodi:guide
+       inkscape:locked="false" /><sodipodi:guide
        position="0,38"
        orientation="0,-1"
        id="guide244"
-       inkscape:locked="false" />
-    <sodipodi:guide
+       inkscape:locked="false" /><sodipodi:guide
        position="0,26"
        orientation="0,-1"
        id="guide246"
-       inkscape:locked="false" />
-  </sodipodi:namedview>
-  <ellipse
-     style="fill:#000000;fill-rule:evenodd;stroke:#000000;stroke-width:1.00506;stroke-linecap:round;stroke-linejoin:round"
-     id="path1"
-     cx="50.507626"
-     cy="57.142857"
-     rx="7.0710678"
-     ry="5.523941"
-     transform="matrix(0.98994949,-0.14142136,0,1,0,0)" />
-  <path
-     style="fill:none;stroke:#000000;stroke-width:1.06719px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-     d="M 57,49 V 8"
-     id="path2" />
-</svg>
+       inkscape:locked="false" /></sodipodi:namedview><rect
+     style="fill:#000000;fill-rule:evenodd;stroke-width:0.999995;stroke-linecap:square"
+     id="rect1"
+     width="10"
+     height="12"
+     x="45"
+     y="38" /></svg>

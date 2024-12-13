@@ -1,0 +1,52 @@
+div.menuEdicao_Figuras {
+	display: inline-grid;
+	grid-template-columns: repeat(5, 3em);
+	gap: 1px;
+	margin-right: 1px;
+}
+div.menuEdicao_Figuras button {
+	overflow: hidden;
+}
+div.menuEdicao_Figuras button.botaoPausa {
+	grid-column: span 2;
+}
+div.menuEdicao_Figuras button.botaoNota {
+	grid-row: span 2;
+}
+div.menuEdicao_Figuras button img {
+	margin: -25px;
+	margin-top: -15px;
+	width: 50px;
+	height: 50px;
+	vertical-align: middle;
+}
+
+div.menuEdicao_Alturas {
+	display: inline-grid;
+	grid-template-columns: repeat(7,3em);
+	gap: 1px;
+}
+
+div.overlayEditor {
+	pointer-events: none;
+	position: absolute;
+	z-index: 10;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+div.overlayEditor img.cursor {
+	position: absolute;
+	margin: 0px -25px;
+	filter: contrast(0) sepia(1) hue-rotate(180deg);
+}
+div.overlayEditor div.inserirNota {
+	align-self: stretch;
+	box-sizing: border-box;
+	flex-shrink: 0;
+	pointer-events: fill;
+	cursor: crosshair;
+}
+div.overlayEditor div.inserirNota:hover {
+	background-color: var(--azulSelecao);
+}

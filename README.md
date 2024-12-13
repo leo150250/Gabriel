@@ -1,9 +1,7 @@
 <p align="center">
   <a href="" rel="noopener">
- <img width=200px height=200px src="public/interno/imagens/logoGabriel.png" alt="Gabriel"></a>
+ <img width=200px height=200px src="public/interno/imagens/logoGabriel_full_big.png" alt="Gabriel"></a>
 </p>
-
-<h3 align="center">Gabriel</h3>
 
 <div align="center">
 

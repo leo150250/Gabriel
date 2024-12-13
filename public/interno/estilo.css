@@ -1,3 +1,22 @@
+:root {
+    --azul: #5883bd;
+    --azulClaro: #bbd1ee;
+    --azulSelecao: #5883bd40;
+}
+.colspan2 {
+    grid-column: span 2;
+}
+.rowspan2 {
+    grid-row: span 2;
+}
+.espacador {
+    margin-right: 1px;
+    flex-grow: 2;
+}
+html {
+    width: 100%;
+    height: 100%;
+}
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     margin: 0;
@@ -5,62 +24,165 @@ body {
     background-color: #CCC;
     width: 100%;
     height: 100%;
+    overflow: hidden;
 }
 
-#toolbar {
-    background-color: #f4f4f4;
-    display: flex;
-    justify-content: space-around;
-    height: 3em;
-    position: absolute;
-    top: 0em;
-    left: 0em;
-    width: 100%;
-}
-
-#toolbar button {
+button, input {
+    outline: none;
     padding: 10px;
     border: none;
     background-color: #fff;
     border-radius: 4px;
     cursor: pointer;
+    min-height: 3rem;
+    min-width: 3rem;
+    margin-right: 1px;
+    &[type="number"] {
+        border-bottom: 5px solid var(--azulClaro);
+        box-sizing: border-box;
+    }
+}
+button:hover, input[type="number"]:hover {
+    background-color: #EEE;
+}
+input[type="number"]:focus {
+    border-bottom: 5px solid var(--azul);
+}
+button.selecionado {
+    background-color: var(--azulClaro);
+}
+button:active {
+    color: #FFF;
+    background-color: var(--azul);
+}
+button img {
+    pointer-events: none;
+}
+label{
+    padding: 10px;
+    vertical-align: baseline;
+    align-self: center;
+}
+label:has(+input) {
+    text-align: right;
 }
 
-#toolbar button:hover {
-    background-color: #ddd;
+#loader {
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 1000;
+    background-color: #F8F8F8;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: ease-in-out 0.25s;
+    progress {
+        appearance: none;
+        height: 0.25em;
+        margin: 1em;
+        &::-webkit-progress-bar {
+            background-color: #0001;
+        }
+        &::-webkit-progress-value {
+            background-color: var(--azulClaro);
+            border-bottom: var(--azul) solid 1px;
+        }
+    }
 }
 
-#instrument-list {
-    margin: 10px;
-    text-align: center;
+#wrapper {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: opacity 0.25s ease-in-out
+}
+body:has(> #menuPrincipal[exibir]) #wrapper {
+    opacity: 0.2;
+    pointer-events: none;
+}
+#menuPrincipal {
+    position: fixed;
+    z-index: 999;
+    display: flex;
+    flex-direction: column;
+    top: 0px;
+    left: -15em;
+    width: 15em;
+    height: 100%;
+    background-color: #F8F8F8;
+    box-shadow: 0px 0px 8px #0004;
+    transition: 0.25s ease-in-out;
+}
+#menuPrincipal[exibir] {
+    left: 0em;
+}
+#menuPrincipal button.fixo {
+    position: absolute;
+    right: 0px;
+}
+#menuPrincipal div {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 2;
+    align-self: stretch;
+}
+#menuPrincipal div button {
+    text-align: left;
+    margin-top: 1px;
+}
+#menuPrincipal img.logo {
+    padding: 1em;
+    background-color: #111;
+    object-fit: scale-down;
+}
+
+.barraMenu {
+    background-color: #F4F4F4;
+    display: flex;
+    position: relative;
+    z-index: 100;
+    box-shadow: 0px 0px 8px #0004;
+}
+.barraMenu hr {
+    margin: 0.5em;
+    border-color: #FFF;
+    opacity: 0.5;
+}
+.menu {
+    display: flex;
+    width: 100%;
+}
+
+#menuBase > div:not(.exibir) {
+    display: none;
 }
 
 #partitura {
-    display: flex;
+    display: inline-flex;
+    flex-grow: 2;
+    position: relative;
     background-color: #FFF;
-    &.linear {
-        width: calc(100%);
-        height: calc(100% - 3em);
-	    overflow: scroll;
-        position: absolute;
-        top: 3em;
-        left: 0;
-    }
-    &.pagina {
-        margin: 1em;
-        overflow: hidden;
-        flex-wrap: wrap;
-        width: 210mm;
-        height: 297mm;
-    }
+}
+#partitura.linear {
+    overflow: scroll;
+}
+#partitura.pagina {
+    margin: 1em;
+    overflow: hidden;
+    flex-wrap: wrap;
+    width: 210mm;
+    height: 297mm;
 }
 
 .sistema {
-	
-	display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 0;
+	position: relative;
+	z-index: 0;
 }
 
 .instrumento {
@@ -134,16 +256,24 @@ body {
 }
 
 .divisao {
-    min-height: 3px;
-    text-align: center;
+    min-height: 100px;
+    text-align: left;
     min-width: 2em;
     position: relative;
+    border-radius: 0.5em;
+}
+.divisao:hover {
+    background-color: var(--azulSelecao);
+}
+.divisao.selecionado {
+    outline: 2px solid var(--azul);
 }
 
 .figura {
     margin: 0px -30px;
     vertical-align: middle;
     position: relative;
+    pointer-events: none;
 }
 
 .sincopa {
@@ -153,10 +283,6 @@ body {
     pointer-events: none;
 }
 
-.selecionado {
-    /* background-color: #08f4; */
-    filter: drop-shadow(0px 0px 4px #F00);
-}
 
 .formula {
     display: flex;
