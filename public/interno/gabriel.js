@@ -79,7 +79,7 @@ class Dialogo {
 		this.selecionado = false;
 		this.elementoDialogo = argElementoDialogo;
 		this.botao = document.createElement("button");
-		this.botao.innerHTMl = argTextoBotao;
+		this.botao.innerHTML = argTextoBotao;
 		this.botao.title = argNome;
 		this.botao.onclick = ()=>{
 			exibirDialogo(this);
@@ -101,6 +101,7 @@ class Dialogo {
 	desselecionar() {
 		if (this.selecionado) {
 			this.selecionado = false;
+			this.elementoDialogo.close();
 			if (this.funcaoCallback!=null) {
 				this.funcaoCallback.apply(this,arguments);
 			}
@@ -1027,6 +1028,40 @@ function exibirMenu(argMenu) {
 			menu.desselecionar();
 		});
 		argMenu.selecionar();
+	}
+}
+
+function exibirDialogo(argDialogo) {
+	if (typeof argDialogo == "object") {
+		argDialogo.selecionar();
+	} else if (typeof argDialogo == "string") {
+		let achei = false;
+		dialogos.forEach(dialogo=>{
+			if (dialogo.elementoDialogo.id == argDialogo) {
+				achei = true;
+				exibirDialogo(dialogo);
+			}
+		});
+		if (!achei) {
+			console.log("Não encontrei o diálogo: " + argDialogo);
+		}
+	}
+}
+
+function fecharDialogo(argDialogo) {
+	if (typeof argDialogo == "object") {
+		argDialogo.desselecionar();
+	} else if (typeof argDialogo == "string") {
+		let achei = false;
+		dialogos.forEach(dialogo=>{
+			if (dialogo.elementoDialogo.id == argDialogo) {
+				achei = true;
+				fecharDialogo(dialogo);
+			}
+		});
+		if (!achei) {
+			console.log("Não encontrei o diálogo: " + argDialogo);
+		}
 	}
 }
 

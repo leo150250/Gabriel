@@ -27,7 +27,7 @@ body {
     overflow: hidden;
 }
 
-button, input[type="number"] {
+button, input:is([type="number"],[type="search"]) {
     outline: none;
     padding: 10px;
     border: none;
@@ -37,18 +37,21 @@ button, input[type="number"] {
     min-height: 3rem;
     min-width: 3rem;
     margin-right: 1px;
-    &[type="number"] {
+    &[type="number"], &[type="search"] {
         border-bottom: 5px solid var(--azulClaro);
         box-sizing: border-box;
     }
+    &[type="search"] {
+        width: fit-content;
+    }
 }
-button:hover, input[type="number"]:hover {
+button:hover, input:is([type="number"],[type="search"]):hover {
     background-color: #EEE;
 }
-input[type="number"]:focus {
+input:is([type="number"],[type="search"]):focus {
     border-bottom: 5px solid var(--azul);
 }
-button.selecionado {
+button.selecionado, tr.selecionado td {
     background-color: var(--azulClaro);
 }
 button:active {
@@ -108,7 +111,32 @@ dialog div.listagem {
     width: calc(100vw - 5em);
     height: calc(100vh - 20em);
 }
-
+dialog div.listagem div:first-child {
+    flex-basis: 20em;
+    flex-shrink: 2;
+    border-right: 1px solid var(--azul);
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+dialog div.listagem div:nth-child(2) {
+    flex-grow: 2;
+    overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-rows: repeat(auto-fit, 200px);
+    gap: 1px;
+    padding: 1px;
+    align-items: start;
+    background-color: #E8E8E8;
+    button {
+        height: 200px;
+        margin-right: 0px;
+        img, span {
+            font-size: 5em;
+        }
+    }
+}
 table {
     display: block;
     overflow-y: scroll;
@@ -197,7 +225,7 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
     flex-grow: 2;
     align-self: stretch;
 }
-#menuPrincipal div button {
+#menuPrincipal div button, dialog div.listagem div:first-child button {
     text-align: left;
     margin-top: 1px;
 }
