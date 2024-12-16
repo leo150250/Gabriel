@@ -27,7 +27,7 @@ body {
     overflow: hidden;
 }
 
-button, input:is([type="number"],[type="search"]) {
+button {
     outline: none;
     padding: 10px;
     border: none;
@@ -37,18 +37,11 @@ button, input:is([type="number"],[type="search"]) {
     min-height: 3rem;
     min-width: 3rem;
     margin-right: 1px;
-    &[type="number"], &[type="search"] {
-        border-bottom: 5px solid var(--azulClaro);
-        box-sizing: border-box;
-    }
-    &[type="search"] {
-        width: fit-content;
-    }
 }
-button:hover, input:is([type="number"],[type="search"]):hover {
+button:hover, input:is([type="number"],[type="search"],[type="text"]):hover, select:hover {
     background-color: #EEE;
 }
-input:is([type="number"],[type="search"]):focus {
+input:is([type="number"],[type="search"],[type="text"]):focus, select:focus {
     border-bottom: 5px solid var(--azul);
 }
 button.selecionado, tr.selecionado td {
@@ -70,12 +63,26 @@ button img {
     pointer-events: none;
 }
 label{
-    padding: 10px;
     vertical-align: baseline;
     align-self: center;
 }
 label:has(+input) {
     text-align: right;
+}
+input:is([type="number"],[type="search"],[type="text"]), select {
+    outline: none;
+    padding: 5px;
+    border: none;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 1px;
+    padding-bottom: 0px;
+    border-bottom: 5px solid var(--azulClaro);
+    box-sizing: border-box;
+}
+select option {
+    background-color: #FFF;
 }
 h1, h2, h3, h4, h5, h6 {
     margin: 0em;
@@ -85,7 +92,7 @@ dialog {
     border: none;
     box-shadow: 0px 4px 8px #0004;
     border-radius: 4px;
-    padding: 0em;
+    padding: 0rem 1rem;
     outline: none;
 }
 dialog::backdrop {
@@ -96,6 +103,7 @@ dialog::backdrop {
 dialog h1 {
     background-color: var(--azul);
     color: #FFF;
+    margin: 0rem -1rem;
 }
 dialog table {
     width: 100%;
@@ -105,6 +113,7 @@ dialog .botoes {
     border-top: 1px solid #CCC;
     display: flex;
     flex-direction: row-reverse;
+    margin: 0rem -1rem;
 }
 dialog div.listagem {
     display: flex;
@@ -137,13 +146,16 @@ dialog div.listagem div:nth-child(2) {
         }
     }
 }
+dialog div.scroll {
+    margin: 0rem -1rem;
+}
 table {
-    display: block;
-    overflow-y: scroll;
-    height: 20em;
     position: relative;
     border-spacing: 0px;
     border-bottom: 1px solid var(--azul);
+}
+div.scroll table {
+    border-bottom: none;
 }
 table tr.sticky {
     position: sticky;
@@ -158,6 +170,16 @@ table td {
     padding: 0.5em;
     border-bottom: 1px solid #DDD;
     box-sizing: border-box;
+    width: inherit;
+}
+span.form {
+    display: flex;
+}
+span.form label {
+    margin: 10px 0px;
+}
+span.form input, span.form select {
+    flex-grow: 2;
 }
 
 #loader {
@@ -396,4 +418,10 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 .armadura img {
     margin: 0px -44px;
     position: relative;
+}
+
+div.scroll {
+    overflow-y: scroll;
+    border-bottom: 1px solid var(--azul);
+    height: 20em;
 }

@@ -10,6 +10,64 @@ var numInstrumento = 0;
 var divInstrumentosListagemCategorias = null;
 var divInstrumentosListagem = null;
 var categoriaSelecionada = null;
+var novosInstrumentos = [];
+var removidosInstrumentos = [];
+var listagemInstrumentos = [];
+class InstrumentoListagem {
+	constructor(argNome,argAbreviatura,argReferencia = null,argPautas = []) {
+		this.nome = argNome;
+		this.abreviatura = argAbreviatura;
+		this.referencia = argReferencia;
+		this.pautas = argPautas;
+		this.inputsSolos = [];
+		this.inputsMudos = [];
+		
+		this.el = document.createElement("tr");
+		this.el.onclick = (e)=>{
+			this.selecionar();
+		}
+		this.el.draggable = true;
+		
+		this.el_ordem = document.createElement("td");
+		this.el_ordem.innerHTML = "⋮ " + (listagemInstrumentos.length + 1);
+		this.el.appendChild(this.el_ordem);
+		
+		this.el_nome = document.createElement("td");
+		this.el_nome.innerHTML += this.nome;
+		this.el.appendChild(this.el_nome);
+
+		this.el_solo = document.createElement("td");
+		this.el_solo.style.textAlign = "center";
+		let novoInputSoloPrincipal = document.createElement("input");
+		novoInputSoloPrincipal.type = "checkbox";
+		novoInputSoloPrincipal.title = "Solo";
+		this.el_solo.appendChild(novoInputSoloPrincipal);
+		this.el.appendChild(this.el_solo);
+		novoInputSoloPrincipal.onchange = (e)=>{
+			inputsSolos.forEach(inputSolo => {
+				inputSolo.checked = novoInputSoloPrincipal.checked;
+			});
+		};
+
+		this.el_mudo = document.createElement("td");
+		this.el_mudo.style.textAlign = "center";
+		let novoInputMudoPrincipal = document.createElement("input");
+		novoInputMudoPrincipal.type = "checkbox";
+		this.el_mudo.appendChild(novoInputMudoPrincipal);
+		this.el.appendChild(this.el_mudo);
+		novoInputMudoPrincipal.onchange = (e)=>{
+			inputsMudos.forEach(inputMudo => {
+				inputMudo.checked = novoInputMudoPrincipal.checked;
+			});
+		};
+		
+		tableListaInstrumentos.appendChild(this.el);
+		listagemInstrumentos.push(this);
+	}
+	selecionar() {
+		this.el.classList.add("selecionado");
+	}
+}
 
 async function carregarModulo() {
 	atualizarLoading(1);
@@ -45,11 +103,11 @@ async function carregarModulo() {
 
 	atualizarLoading(-1);
 	dialogoInstrumentos.selecionar();
-	dialogoSelecionarInstrumentos.selecionar();
+	//dialogoSelecionarInstrumentos.selecionar();
 	return true;
 }
 
-function gerarInstrumentoListagem(argInstrumento) {
+function gerarInstrumentoListagem(argInstrumento,argAcao = null) {
 	let novaLinha;
 	let novoCampo;
 	novaLinha = document.createElement("tr");
@@ -60,10 +118,11 @@ function gerarInstrumentoListagem(argInstrumento) {
 	novoCampo = document.createElement("td");
 	numInstrumento++;
 	novoCampo.innerHTML = "⋮ " + numInstrumento;
-	let novoBotao = document.createElement("button");
-	novoBotao.innerHTML = "▸";
 	let pautasAbertas = false;
 	let pautasParaAbrir =[];
+	/*
+	let novoBotao = document.createElement("button");
+	novoBotao.innerHTML = "▸";
 	novoBotao.onclick=(e)=>{
 		pautasAbertas=!pautasAbertas;
 		if (pautasAbertas) {
@@ -81,38 +140,13 @@ function gerarInstrumentoListagem(argInstrumento) {
 		}
 	}
 	novoCampo.appendChild(novoBotao);
+	*/
 	novaLinha.draggable = true;
 	novaLinha.appendChild(novoCampo);
 	//Marcação solo
-	novoCampo = document.createElement("td");
-	novoCampo.innerHTML = argInstrumento.nome;
-	novaLinha.appendChild(novoCampo);
-	novoCampo = document.createElement("td");
-	novoCampo.style.textAlign = "center";
-	let novoInputSoloPrincipal = document.createElement("input");
-	novoInputSoloPrincipal.type = "checkbox";
-	novoInputSoloPrincipal.title = "Solo";
-	novoCampo.appendChild(novoInputSoloPrincipal);
-	novaLinha.appendChild(novoCampo);
-	let inputsSolos = [];
-	novoInputSoloPrincipal.onchange = (e)=>{
-		inputsSolos.forEach(inputSolo => {
-			inputSolo.checked = novoInputSoloPrincipal.checked;
-		});
-	};
+	
 	//Marcação mudo
-	novoCampo = document.createElement("td");
-	novoCampo.style.textAlign = "center";
-	let novoInputMudoPrincipal = document.createElement("input");
-	novoInputMudoPrincipal.type = "checkbox";
-	novoCampo.appendChild(novoInputMudoPrincipal);
-	novaLinha.appendChild(novoCampo);
-	let inputsMudos = [];
-	novoInputMudoPrincipal.onchange = (e)=>{
-		inputsMudos.forEach(inputMudo => {
-			inputMudo.checked = novoInputMudoPrincipal.checked;
-		});
-	};
+	
 	tableListaInstrumentos.appendChild(novaLinha);
 	let numPauta = 0;
 	argInstrumento.pautas.forEach(pauta => {
@@ -182,8 +216,10 @@ function obterListaInstrumentos() {
 	tableListaInstrumentos.appendChild(headerTabela);
 	numInstrumento = 0;
 	instrumentos.forEach(instrumento => {
-		gerarInstrumentoListagem(instrumento);
+		//gerarInstrumentoListagem(instrumento);
+		new InstrumentoListagem(instrumento.nome,instrumento.abreviatura,instrumento,instrumento.obterListagemPautas());
 	});
+	console.log(listagemInstrumentos);
 }
 
 function obterListagem() {
@@ -263,7 +299,8 @@ function gerarBotaoInstrumento(argInstrumento) {
 	descricao += "\nTransposição: " + textoTransposicao + "\n";
 	novoBotaoInstrumento.title=descricao;
 	novoBotaoInstrumento.onclick = (e)=>{
-		let novaLinhaGerada = gerarInstrumentoListagem(argInstrumento);
+		let novaLinhaGerada = gerarInstrumentoListagem(argInstrumento,"adicionar");
+		novosInstrumentos.push(argInstrumento);
 		novaLinhaGerada.scrollIntoView({
 			behavior: "smooth",
 			block: "center",

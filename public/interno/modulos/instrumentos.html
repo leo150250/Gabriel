@@ -2,17 +2,37 @@
 	<h1>
 		Instrumentos
 	</h1>
-	<table id="listaInstrumentos">
-		<tr class="sticky">
-			<th>Ordem</th>
-			<th>Instrumento</th>
-			<th>S</th>
-			<th>M</th>
-		</tr>
-		<tr>
-			<td>AAAAAA</td>
-		</tr>
-	</table>
+	<div class="scroll">
+		<table id="listaInstrumentos">
+			<tr class="sticky">
+				<th>#</th>
+				<th>Instrumento</th>
+				<th>S</th>
+				<th>M</th>
+			</tr>
+			<tr>
+				<td>AAAAAA</td>
+			</tr>
+		</table>
+	</div>
+	<div>
+		<span class="form"><label>Nome:</label><input type="text"></span>
+		<span class="form"><label>Abreviatura:</label><input type="text"></span>
+		<span class="form"><label>Tipo de notação:</label>
+		<select>
+			<option>Comum</option>
+			<option>Rítmica</option>
+			<option>Tablatura</option>
+		</select></span>
+		<span class="form"><label>Transposição:</label>
+		<select>
+			<option>C (Dó) - Sem transposição</option>
+			<option>F (Fá) - 1 sustenido</option>
+			<option>Bb (Si bemol) - 2 sustenidos</option>
+			<option>Eb (Mi bemol) - 3 sustenidos</option>
+		</select></span>
+		<span class="form">Pautas:</span>
+	</div>
 	<div class="botoes">
 		<button type="button" class="ok" title="Aplicar alterações e retornar">OK</button>
 		<button type="button" title="Descartar alterações e retornar">Cancelar</button>

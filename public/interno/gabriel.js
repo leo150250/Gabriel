@@ -776,6 +776,13 @@ class Instrumento {
 	obterUltimaPauta() {
 		return this.pautas[this.pautas.length - 1];
 	}
+	obterListagemPautas() {
+		let listagemPautas = [];
+		this.pautas.forEach(pauta=>{
+			listagemPautas.push(pauta.clavePadrao);
+		});
+		return listagemPautas;
+	}
 }
 
 class Sistema {
