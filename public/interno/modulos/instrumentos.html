@@ -17,22 +17,22 @@
 	</div>
 	<div>
 		<span class="form">
-			<span class="form"><label>Nome:</label><input type="text"></span>
-			<span class="form"><label>Abreviatura:</label><input type="text"></span>
+			<span class="form"><label>Nome:</label><input disabled type="text" id="dialogInstrumentos_nomeInstrumento" onchange="modificarInstrumentoSelecionado()"></span>
+			<span class="form"><label>Abreviatura:</label><input disabled type="text" id="dialogInstrumentos_abreviaturaInstrumento" onchange="modificarInstrumentoSelecionado()"></span>
 		</span>
 		<span class="form">
 			<span class="form"><label>Tipo de notação:</label>
-			<select>
-				<option>Comum</option>
-				<option>Rítmica</option>
-				<option>Tablatura</option>
+			<select id="dialogInstrumentos_tipoNotacaoInstrumento" disabled onchange="modificarInstrumentoSelecionado()">
+				<option value="comum">Comum</option>
+				<option value="ritmica">Rítmica</option>
+				<option value="tablatura">Tablatura</option>
 			</select></span>
 			<span class="form"><label>Transposição:</label>
-			<select>
-				<option>C (Dó) - Sem transposição</option>
-				<option>F (Fá) - 1 sustenido</option>
-				<option>Bb (Si bemol) - 2 sustenidos</option>
-				<option>Eb (Mi bemol) - 3 sustenidos</option>
+			<select id="dialogInstrumentos_transposicaoInstrumento" disabled onchange="modificarInstrumentoSelecionado()">
+				<option value="0">C (Dó) - Sem transposição</option>
+				<option value="1">F (Fá) - 1 sustenido</option>
+				<option value="2">Bb (Si bemol) - 2 sustenidos</option>
+				<option value="3">Eb (Mi bemol) - 3 sustenidos</option>
 			</select></span>
 		</span>
 	</div>

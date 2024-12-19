@@ -82,6 +82,10 @@ input:is([type="number"],[type="search"],[type="text"]), select {
 input:is([type="number"],[type="search"],[type="text"]):focus, select:focus {
     border-bottom: 2px solid var(--azul);
 }
+input:disabled, select:disabled {
+    background-color: #EEE;
+    border-bottom: 2px solid #CCC;
+}
 select option {
     background-color: #FFF;
 }

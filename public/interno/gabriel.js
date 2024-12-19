@@ -726,13 +726,14 @@ class Pauta {
 }
 
 class Instrumento {
-	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null) {
+	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null,argNotacao = "comum",argTransposicao = 0) {
 		this.nome = "";
 		this.abreviatura = "";
 		this.el_nome = document.createElement("div");
 		this.atualizarNome(argNome, argAbrev);
 		this.pautas = [];
-		this.transposicao = 0;
+		this.notacao = argNotacao;
+		this.transposicao = argTransposicao;
 		this.instrumentoAnterior = argInstrumentoAnterior;
 		this.instrumentoPosterior = null;
 		if (this.instrumentoAnterior != null) {

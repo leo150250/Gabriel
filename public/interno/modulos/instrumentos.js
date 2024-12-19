@@ -14,6 +14,11 @@ var divInstrumentosListagem = null;
 var categoriaSelecionada = null;
 var listagemInstrumentos = [];
 
+var inputInstrumentoNome = null;
+var inputInstrumentoAbreviatura = null;
+var inputInstrumentoTipoNotacao = null;
+var inputInstrumentoTransposicao = null;
+
 class PautaListagem {
 	constructor(argInstrumento,argClave) {
 		this.instrumento = argInstrumento;
@@ -54,15 +59,21 @@ class PautaListagem {
 	}
 }
 class InstrumentoListagem {
-	constructor(argNome,argAbreviatura,argReferencia = null,argPautas = []) {
+	constructor(argNome,argAbreviatura,argReferencia = null,argPautas = [],argNotacao = "comum",argTransposicao = 0) {
 		this.nome = argNome;
 		this.abreviatura = argAbreviatura;
 		this.referencia = argReferencia;
-		this.pautas = [];
 		this.ordem = listagemInstrumentos.length;
+		this.pautas = [];
 		argPautas.forEach(pauta=>{
 			this.pautas.push(new PautaListagem(this,pauta));
 		});
+		this.notacao = argNotacao; //[TODO] Classe de notações
+		if (this.referencia != null) {
+			this.transposicao = this.referencia.transposicao;
+		} else {
+			this.transposicao = argTransposicao;
+		}
 	
 		this.el = document.createElement("tr");
 		this.el.onclick = (e)=>{
@@ -210,9 +221,8 @@ class InstrumentoListagem {
 	}
 	selecionar() {
 		this.el.classList.add("selecionado");
-		this.pautas.forEach(pauta => {
-			tableListaPautas.appendChild(pauta.el);
-		});
+		//Atualiza os campos do formulário para os valores do instrumento selecionado, e habilita os campos para edição
+		atualizarCamposFormulario(this);
 	}
 	desselecionar() {
 		this.el.classList.remove("selecionado");
@@ -300,6 +310,11 @@ async function carregarModulo() {
 	//divPartitura.appendChild(divEditor);
 	divMenuTopo.appendChild(dialogoInstrumentos.botao);
 
+	inputInstrumentoNome = document.getElementById("dialogInstrumentos_nomeInstrumento");
+	inputInstrumentoAbreviatura = document.getElementById("dialogInstrumentos_abreviaturaInstrumento");
+	inputInstrumentoTipoNotacao = document.getElementById("dialogInstrumentos_tipoNotacaoInstrumento");
+	inputInstrumentoTransposicao = document.getElementById("dialogInstrumentos_transposicaoInstrumento");
+
 	atualizarLoading(-1);
 	dialogoInstrumentos.selecionar();
 	//dialogoSelecionarInstrumentos.selecionar();
@@ -317,6 +332,14 @@ function exibirInstrumentoListagem(argInstrumento) {
 }
 function obterListaInstrumentos() {
 	listagemInstrumentos = [];
+	inputInstrumentoNome.disabled = true;
+	inputInstrumentoAbreviatura.disabled = true;
+	inputInstrumentoTipoNotacao.disabled = true;
+	inputInstrumentoTransposicao.disabled = true;
+	inputInstrumentoNome.value = "";
+	inputInstrumentoAbreviatura.value = "";
+	inputInstrumentoTipoNotacao.value = "";
+	inputInstrumentoTransposicao.value = "";
 	let headerTabelaInstrumentos = tableListaInstrumentos.getElementsByTagName("tr")[0];
 	//Obtem o primeiro elemento tr da tabela tableListaInstrumentos
 	while (tableListaInstrumentos.firstChild) {
@@ -334,7 +357,30 @@ function obterListaInstrumentos() {
 		//gerarInstrumentoListagem(instrumento);
 		new InstrumentoListagem(instrumento.nome,instrumento.abreviatura,instrumento,instrumento.obterListagemPautas());
 	});
-	console.log(listagemInstrumentos);
+	//console.log(listagemInstrumentos);
+}
+function atualizarCamposFormulario(argInstrumentoListagem) {
+	inputInstrumentoNome.value = argInstrumentoListagem.nome;
+	inputInstrumentoAbreviatura.value = argInstrumentoListagem.abreviatura;
+	inputInstrumentoTipoNotacao.value = argInstrumentoListagem.notacao;
+	inputInstrumentoTransposicao.value = argInstrumentoListagem.transposicao;
+
+	inputInstrumentoNome.disabled = false;
+	inputInstrumentoAbreviatura.disabled = false;
+	inputInstrumentoTipoNotacao.disabled = false;
+	inputInstrumentoTransposicao.disabled = false;
+
+	argInstrumentoListagem.pautas.forEach(pauta => {
+		tableListaPautas.appendChild(pauta.el);
+	});
+}
+function modificarInstrumentoSelecionado() {
+	instrumentoSelecionado.nome = inputInstrumentoNome.value;
+	instrumentoSelecionado.abreviatura = inputInstrumentoAbreviatura.value;
+	instrumentoSelecionado.notacao = inputInstrumentoTipoNotacao.value;
+	instrumentoSelecionado.transposicao = inputInstrumentoTransposicao.value;
+
+	instrumentoSelecionado.el_nome.innerHTML = "* " + instrumentoSelecionado.nome;
 }
 
 function aplicarAlteracoesListagem() {
@@ -343,18 +389,23 @@ function aplicarAlteracoesListagem() {
 	//Varre listagemInstrumentos possui referencia que não seja nula
 	for (let i = 0; i < listagemInstrumentos.length; i++) {
 		if (listagemInstrumentos[i].referencia!=null) {
-			instrumentosAtualizacao.push(listagemInstrumentos[i].referencia);
 			//Reseta o instrumentoAnterior e instrumentoPosterior da referência:
 			listagemInstrumentos[i].referencia.instrumentoAnterior = null;
 			listagemInstrumentos[i].referencia.instrumentoPosterior = null;
+			listagemInstrumentos[i].referencia.nome = listagemInstrumentos[i].nome;
+			listagemInstrumentos[i].referencia.abreviatura = listagemInstrumentos[i].abreviatura;
+			listagemInstrumentos[i].referencia.notacao = listagemInstrumentos[i].notacao;
+			listagemInstrumentos[i].referencia.transposicao = listagemInstrumentos[i].transposicao;
+
+			instrumentosAtualizacao.push(listagemInstrumentos[i].referencia);
 		} else {
 			//Gera uma array com as claves das pautas
 			let pautas = [];
-			instrumento.pautas.forEach(pauta=>{
-				listagemInstrumentos[i].push(pauta.clave);
+			listagemInstrumentos[i].pautas.forEach(pauta=>{
+				pautas.push(pauta.clave);
 			});
 			//Cria um novo instrumento com as informações que estão no objeto:
-			let novoInstrumento = new Instrumento(instrumento.nome,instrumento.abreviatura,pautas);
+			let novoInstrumento = new Instrumento(listagemInstrumentos[i].nome,listagemInstrumentos[i].abreviatura,pautas,null,listagemInstrumentos[i].notacao,listagemInstrumentos[i].transposicao);
 			//Adiciona o novo instrumento à array de instrumentos
 			instrumentosAtualizacao.push(novoInstrumento);
 		}
@@ -455,7 +506,7 @@ function gerarBotaoInstrumento(argInstrumento) {
 	novoBotaoInstrumento.title=descricao;
 	novoBotaoInstrumento.onclick = (e)=>{
 		//let novaLinhaGerada = gerarInstrumentoListagem(argInstrumento,"adicionar");
-		let novoInstrumentoGerado = new InstrumentoListagem(argInstrumento.nome,argInstrumento.abreviatura,null,argInstrumento.pautas);
+		let novoInstrumentoGerado = new InstrumentoListagem(argInstrumento.nome,argInstrumento.abreviatura,null,argInstrumento.pautas,"comum",argInstrumento.transposicao);
 		novoInstrumentoGerado.el.scrollIntoView({
 			behavior: "smooth",
 			block: "center",
