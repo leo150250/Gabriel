@@ -1,8 +1,8 @@
-<dialog>
+<dialog id="dialogoInstrumentos">
 	<h1>
 		Instrumentos
 	</h1>
-	<div class="scroll">
+	<div class="scroll" style="height: 20rem">
 		<table id="listaInstrumentos">
 			<tr class="sticky">
 				<th>#</th>
@@ -16,26 +16,42 @@
 		</table>
 	</div>
 	<div>
-		<span class="form"><label>Nome:</label><input type="text"></span>
-		<span class="form"><label>Abreviatura:</label><input type="text"></span>
-		<span class="form"><label>Tipo de notação:</label>
-		<select>
-			<option>Comum</option>
-			<option>Rítmica</option>
-			<option>Tablatura</option>
-		</select></span>
-		<span class="form"><label>Transposição:</label>
-		<select>
-			<option>C (Dó) - Sem transposição</option>
-			<option>F (Fá) - 1 sustenido</option>
-			<option>Bb (Si bemol) - 2 sustenidos</option>
-			<option>Eb (Mi bemol) - 3 sustenidos</option>
-		</select></span>
-		<span class="form">Pautas:</span>
+		<span class="form">
+			<span class="form"><label>Nome:</label><input type="text"></span>
+			<span class="form"><label>Abreviatura:</label><input type="text"></span>
+		</span>
+		<span class="form">
+			<span class="form"><label>Tipo de notação:</label>
+			<select>
+				<option>Comum</option>
+				<option>Rítmica</option>
+				<option>Tablatura</option>
+			</select></span>
+			<span class="form"><label>Transposição:</label>
+			<select>
+				<option>C (Dó) - Sem transposição</option>
+				<option>F (Fá) - 1 sustenido</option>
+				<option>Bb (Si bemol) - 2 sustenidos</option>
+				<option>Eb (Mi bemol) - 3 sustenidos</option>
+			</select></span>
+		</span>
+	</div>
+	<div class="scroll" style="height: 10rem">
+		<table id="listaPautas">
+			<tr class="sticky">
+				<th>Pauta</th>
+				<th>Clave</th>
+				<th>S</th>
+				<th>M</th>
+			</tr>
+			<tr>
+				<td>AAAAAAAAAAAAAA</td>
+			</tr>
+		</table>
 	</div>
 	<div class="botoes">
-		<button type="button" class="ok" title="Aplicar alterações e retornar">OK</button>
-		<button type="button" title="Descartar alterações e retornar">Cancelar</button>
+		<button type="button" class="ok" title="Aplicar alterações e retornar" onclick="aplicarAlteracoesListagem()">OK</button>
+		<button type="button" title="Descartar alterações e retornar" onclick="fecharDialogo('dialogoInstrumentos')">Cancelar</button>
 		<div class="espacador"></div>
 		<button type="button" title="Adicionar um novo instrumento à partitura" onclick="exibirDialogo('dialogoInstrumentosSelecionar')">+🎹</button>
 	</div>

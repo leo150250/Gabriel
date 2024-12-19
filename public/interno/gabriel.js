@@ -102,9 +102,6 @@ class Dialogo {
 		if (this.selecionado) {
 			this.selecionado = false;
 			this.elementoDialogo.close();
-			if (this.funcaoCallback!=null) {
-				this.funcaoCallback.apply(this,arguments);
-			}
 		}
 	}
 }

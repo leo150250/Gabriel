@@ -12,6 +12,7 @@
 .espacador {
     margin-right: 1px;
     flex-grow: 2;
+    width: auto;
 }
 html {
     width: 100%;
@@ -38,11 +39,8 @@ button {
     min-width: 3rem;
     margin-right: 1px;
 }
-button:hover, input:is([type="number"],[type="search"],[type="text"]):hover, select:hover {
+button:hover, input:is([type="number"],[type="search"],[type="text"]):hover, select:hover, tr:hover td {
     background-color: #EEE;
-}
-input:is([type="number"],[type="search"],[type="text"]):focus, select:focus {
-    border-bottom: 5px solid var(--azul);
 }
 button.selecionado, tr.selecionado td {
     background-color: var(--azulClaro);
@@ -78,8 +76,11 @@ input:is([type="number"],[type="search"],[type="text"]), select {
     cursor: pointer;
     margin-right: 1px;
     padding-bottom: 0px;
-    border-bottom: 5px solid var(--azulClaro);
+    border-bottom: 2px solid var(--azulClaro);
     box-sizing: border-box;
+}
+input:is([type="number"],[type="search"],[type="text"]):focus, select:focus {
+    border-bottom: 2px solid var(--azul);
 }
 select option {
     background-color: #FFF;
@@ -87,6 +88,11 @@ select option {
 h1, h2, h3, h4, h5, h6 {
     margin: 0em;
     padding: 0.5em 0.5em;
+}
+div.scroll {
+    overflow-y: scroll;
+    border-bottom: 1px solid var(--azul);
+    align-content: start;
 }
 dialog {
     border: none;
@@ -115,10 +121,23 @@ dialog .botoes {
     flex-direction: row-reverse;
     margin: 0rem -1rem;
 }
+dialog div {
+    display: flex;
+    flex-wrap: wrap;
+}
+dialog div > div {
+    width: 100%;
+}
+dialog div:has(> span.form) {
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
 dialog div.listagem {
     display: flex;
     width: calc(100vw - 5em);
     height: calc(100vh - 20em);
+    flex-wrap: nowrap;
+    margin: 0rem -1rem;
 }
 dialog div.listagem div:first-child {
     flex-basis: 20em;
@@ -161,6 +180,26 @@ table tr.sticky {
     position: sticky;
     top: 0px;
 }
+table tr.dragOver {
+    height: 1rem;
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    margin: -0.5rem 0rem;
+    opacity: 0;
+    background-color: var(--azulSelecao);
+    border-left: groove 2px var(--azulSelecao);
+    border-right: groove 2px var(--azulSelecao);
+}
+
+table tr.dragOver.onDrag {
+    opacity: 1;
+    cursor: grabbing;
+}
+table tr.dragOver.onDrag hr {
+    pointer-events: none;
+    border-color: var(--azulSelecao);
+}
 table th {
     background-color: #DDD;
     min-width: 2em;
@@ -174,12 +213,16 @@ table td {
 }
 span.form {
     display: flex;
+    flex-grow: 2;
+    flex-wrap: wrap;
+    gap: 1rem;
 }
 span.form label {
-    margin: 10px 0px;
+    margin: 0.5rem 0rem;
 }
 span.form input, span.form select {
     flex-grow: 2;
+    margin-left: -1rem;
 }
 
 #loader {
@@ -418,10 +461,4 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 .armadura img {
     margin: 0px -44px;
     position: relative;
-}
-
-div.scroll {
-    overflow-y: scroll;
-    border-bottom: 1px solid var(--azul);
-    height: 20em;
 }

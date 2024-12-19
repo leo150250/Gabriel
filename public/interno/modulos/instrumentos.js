@@ -5,31 +5,81 @@ var dialogoInstrumentos = null;
 var dialogoSelecionarInstrumentos = null;
 var jsonInstrumentos = [];
 var tableListaInstrumentos = null;
+var tableListaPautas = null;
 var numInstrumento = 0;
+var instrumentoSelecionado = null;
 
 var divInstrumentosListagemCategorias = null;
 var divInstrumentosListagem = null;
 var categoriaSelecionada = null;
-var novosInstrumentos = [];
-var removidosInstrumentos = [];
 var listagemInstrumentos = [];
+
+class PautaListagem {
+	constructor(argInstrumento,argClave) {
+		this.instrumento = argInstrumento;
+		this.clave = argClave;
+		this.el = document.createElement("tr");
+		this.ordem = argInstrumento.pautas.length;
+
+		this.el_nome = document.createElement("td");
+		this.atualizarIdentificacao();
+		this.el.appendChild(this.el_nome);
+
+		this.el_clave = document.createElement("td");
+		this.el_clave.innerHTML = argClave;
+		this.el.appendChild(this.el_clave);
+
+		this.el_solo = document.createElement("td");
+		this.el_solo.style.textAlign = "center";
+		this.el_inputSolo = document.createElement("input");
+		this.el_inputSolo.type = "checkbox";
+		this.el_inputSolo.onchange = (e)=>{
+			this.instrumento.alterarSolo();
+		}
+		this.el_solo.appendChild(this.el_inputSolo);
+		this.el.appendChild(this.el_solo);
+
+		this.el_mudo = document.createElement("td");
+		this.el_mudo.style.textAlign = "center";
+		this.el_inputMudo = document.createElement("input");
+		this.el_inputMudo.type = "checkbox";
+		this.el_inputMudo.onchange = (e)=>{
+			this.instrumento.alterarMudo();
+		}
+		this.el_mudo.appendChild(this.el_inputMudo);
+		this.el.appendChild(this.el_mudo);
+	}
+	atualizarIdentificacao() {
+		this.el_nome.innerHTML = "Pauta " + (this.instrumento.ordem + 1) + "." + (this.ordem + 1);
+	}
+}
 class InstrumentoListagem {
 	constructor(argNome,argAbreviatura,argReferencia = null,argPautas = []) {
 		this.nome = argNome;
 		this.abreviatura = argAbreviatura;
 		this.referencia = argReferencia;
-		this.pautas = argPautas;
-		this.inputsSolos = [];
-		this.inputsMudos = [];
-		
+		this.pautas = [];
+		this.ordem = listagemInstrumentos.length;
+		argPautas.forEach(pauta=>{
+			this.pautas.push(new PautaListagem(this,pauta));
+		});
+	
 		this.el = document.createElement("tr");
 		this.el.onclick = (e)=>{
-			this.selecionar();
+			exibirInstrumentoListagem(this);
 		}
 		this.el.draggable = true;
+		this.el.style.cursor = "grab";
+		this.el.ondragstart = (e)=>{
+			e.dataTransfer.setData("integer",this.ordem);
+			this.el.style.cursor = "grabbing";
+		}
+		this.el.ondragend = (e)=>{
+			this.el.style.cursor = "grab";
+		}
 		
 		this.el_ordem = document.createElement("td");
-		this.el_ordem.innerHTML = "⋮ " + (listagemInstrumentos.length + 1);
+		this.el_ordem.innerHTML = "⋮ " + (this.ordem + 1);
 		this.el.appendChild(this.el_ordem);
 		
 		this.el_nome = document.createElement("td");
@@ -38,34 +88,181 @@ class InstrumentoListagem {
 
 		this.el_solo = document.createElement("td");
 		this.el_solo.style.textAlign = "center";
-		let novoInputSoloPrincipal = document.createElement("input");
-		novoInputSoloPrincipal.type = "checkbox";
-		novoInputSoloPrincipal.title = "Solo";
-		this.el_solo.appendChild(novoInputSoloPrincipal);
-		this.el.appendChild(this.el_solo);
-		novoInputSoloPrincipal.onchange = (e)=>{
-			inputsSolos.forEach(inputSolo => {
-				inputSolo.checked = novoInputSoloPrincipal.checked;
-			});
+		this.el_inputSolo = document.createElement("input");
+		this.el_inputSolo.type = "checkbox";
+		this.el_inputSolo.title = "Solo";
+		this.el_inputSolo.onchange = (e)=>{
+			this.alterarSolo(this.el_inputSolo.checked);
 		};
+		this.el_solo.appendChild(this.el_inputSolo);
+		this.el.appendChild(this.el_solo);
 
 		this.el_mudo = document.createElement("td");
 		this.el_mudo.style.textAlign = "center";
-		let novoInputMudoPrincipal = document.createElement("input");
-		novoInputMudoPrincipal.type = "checkbox";
-		this.el_mudo.appendChild(novoInputMudoPrincipal);
-		this.el.appendChild(this.el_mudo);
-		novoInputMudoPrincipal.onchange = (e)=>{
-			inputsMudos.forEach(inputMudo => {
-				inputMudo.checked = novoInputMudoPrincipal.checked;
-			});
+		this.el_inputMudo = document.createElement("input");
+		this.el_inputMudo.type = "checkbox";
+		this.el_inputMudo.onchange = (e)=>{
+			this.alterarMudo(this.el_inputMudo.checked);
 		};
+		this.el_mudo.appendChild(this.el_inputMudo);
+		this.el.appendChild(this.el_mudo);
 		
+		
+		this.el_dragAntes = document.createElement("tr");
+		this.el_dragAntes.classList.add("dragOver");
+		this.el_dragAntes.innerHTML="<hr>";
+		this.el_dragAntes.ondrop = (e)=>{
+			//console.log("ANTES");
+			e.preventDefault();
+			let dados = e.dataTransfer.getData("integer");
+			//Realocar o índice de listagemInstrumentos armazenado do drop para o índice onde está esta classe, e reordena os demais itens da array listagemInstrumentos
+			let indice = parseInt(dados);
+			let indiceDestino = this.ordem;
+			if (indice < indiceDestino) {
+				indiceDestino--;
+			}
+			let item = listagemInstrumentos[indice];
+			listagemInstrumentos.splice(indice,1);
+			//Imprime no console o nome de cada instrumento em listagemInstrumentos em uma única linha, separados por vírgula
+			//console.log(listagemInstrumentos.map(item=>item.nome).join(", "));
+			//Insere o item no novo
+			listagemInstrumentos.splice(indiceDestino,0,item);
+			//console.log(listagemInstrumentos.map(item=>item.nome).join(", "));
+			listagemInstrumentos.forEach((item,indice)=>{
+				item.ordem = indice;
+				item.el_ordem.innerHTML = "⋮ " + (item.ordem + 1);
+				item.pautas.forEach(pauta=>{
+					pauta.atualizarIdentificacao();
+				});
+			});
+			listagemInstrumentos[indiceDestino].el_nome.innerHTML = "* " + listagemInstrumentos[indiceDestino].nome;
+			//Reordena os children da tableListaInstrumentos de acordo com a nova ordem
+			let headerTabelaInstrumentos = tableListaInstrumentos.childNodes[0];
+			while (tableListaInstrumentos.firstChild) {
+				tableListaInstrumentos.removeChild(tableListaInstrumentos.firstChild);
+			}
+			tableListaInstrumentos.appendChild(headerTabelaInstrumentos);
+			listagemInstrumentos.forEach(item=>{
+				tableListaInstrumentos.appendChild(item.el_dragAntes);
+				tableListaInstrumentos.appendChild(item.el);
+				tableListaInstrumentos.appendChild(item.el_dragDepois);
+			});
+			this.el_dragAntes.classList.remove("onDrag");
+		}
+		this.el_dragAntes.ondragover = (e)=>{
+			e.preventDefault();
+			this.el_dragAntes.classList.add("onDrag");
+		}
+		this.el_dragAntes.ondragleave = (e)=>{
+			this.el_dragAntes.classList.remove("onDrag");
+		}
+
+		this.el_dragDepois = document.createElement("tr");
+		this.el_dragDepois.classList.add("dragOver");
+		this.el_dragDepois.innerHTML="<hr>";
+		this.el_dragDepois.ondrop = (e)=>{
+			//console.log("DEPOIS");
+			e.preventDefault();
+			let dados = e.dataTransfer.getData("integer");
+			//Realocar o índice de listagemInstrumentos armazenado do drop para o índice onde está esta classe, e reordena os demais itens da array listagemInstrumentos
+			let indice = parseInt(dados);
+			let indiceDestino = this.ordem;
+			if (indice < indiceDestino) {
+				indiceDestino--;
+			}
+			let item = listagemInstrumentos[indice];
+			listagemInstrumentos.splice(indice,1);
+			listagemInstrumentos.splice(indiceDestino,0,item);
+			listagemInstrumentos.forEach((item,indice)=>{
+				item.ordem = indice;
+				item.el_ordem.innerHTML = "⋮ " + (item.ordem + 1);
+				item.pautas.forEach(pauta=>{
+					pauta.atualizarIdentificacao();
+				});
+			});
+			listagemInstrumentos[indiceDestino].el_nome.innerHTML = "* " + listagemInstrumentos[indiceDestino].nome;
+			//Reordena os children da tableListaInstrumentos de acordo com a nova ordem
+			let headerTabelaInstrumentos = tableListaInstrumentos.childNodes[0];
+			while (tableListaInstrumentos.firstChild) {
+				tableListaInstrumentos.removeChild(tableListaInstrumentos.firstChild);
+			}
+			tableListaInstrumentos.appendChild(headerTabelaInstrumentos);
+			listagemInstrumentos.forEach(item=>{
+				tableListaInstrumentos.appendChild(item.el_dragAntes);
+				tableListaInstrumentos.appendChild(item.el);
+				tableListaInstrumentos.appendChild(item.el_dragDepois);
+			});
+			this.el_dragDepois.classList.remove("onDrag");
+			this.el_nome.innerHTML = "* " + this.nome;
+		}
+		this.el_dragDepois.ondragover = (e)=>{
+			e.preventDefault();
+			this.el_dragDepois.classList.add("onDrag");
+		}
+		this.el_dragDepois.ondragleave = (e)=>{
+			this.el_dragDepois.classList.remove("onDrag");
+		}
+
+		tableListaInstrumentos.appendChild(this.el_dragAntes);
 		tableListaInstrumentos.appendChild(this.el);
+		tableListaInstrumentos.appendChild(this.el_dragDepois);
 		listagemInstrumentos.push(this);
 	}
 	selecionar() {
 		this.el.classList.add("selecionado");
+		this.pautas.forEach(pauta => {
+			tableListaPautas.appendChild(pauta.el);
+		});
+	}
+	desselecionar() {
+		this.el.classList.remove("selecionado");
+		let headerTabelaPautas = tableListaPautas.childNodes[0];
+		while (tableListaPautas.firstChild) {
+			tableListaPautas.removeChild(tableListaPautas.firstChild);
+		}
+		tableListaPautas.appendChild(headerTabelaPautas);
+	}
+	alterarSolo(argDefinicao = null) {
+		if (argDefinicao == null) {
+			let numInputs = 0;
+			this.pautas.forEach(pauta => {
+				if (pauta.el_inputSolo.checked) { numInputs++ };
+			});
+			if (numInputs == 0) {
+				this.alterarSolo(false);
+			} else if (numInputs == this.pautas.length) {
+				this.alterarSolo(true);
+			} else {
+				this.el_inputSolo.indeterminate = true;
+			}
+		} else {
+			this.el_inputSolo.indeterminate = false;
+			this.el_inputSolo.checked = argDefinicao;
+			this.pautas.forEach(pauta => {
+				pauta.el_inputSolo.checked = argDefinicao;
+			});
+		}
+	}
+	alterarMudo(argDefinicao = null) {
+		if (argDefinicao == null) {
+			let numInputs = 0;
+			this.pautas.forEach(pauta => {
+				if (pauta.el_inputMudo.checked) { numInputs++ };
+			});
+			if (numInputs == 0) {
+				this.alterarMudo(false);
+			} else if (numInputs == this.pautas.length) {
+				this.alterarMudo(true);
+			} else {
+				this.el_inputMudo.indeterminate = true;
+			}
+		} else {
+			this.el_inputMudo.indeterminate = false;
+			this.el_inputMudo.checked = argDefinicao;
+			this.pautas.forEach(pauta => {
+				pauta.el_inputMudo.checked = argDefinicao;
+			});
+		}
 	}
 }
 
@@ -83,6 +280,7 @@ async function carregarModulo() {
 	dialogMenuInstrumentos = conteudoDialogo.childNodes[0].childNodes[1].childNodes[0];
 	dialogoInstrumentos = new Dialogo(nomeModulo,botaoModulo,dialogMenuInstrumentos,obterListaInstrumentos);
 	tableListaInstrumentos = document.getElementById("listaInstrumentos");
+	tableListaPautas = document.getElementById("listaPautas");
 
 	let paginaSelecionarInstrumentos = await carregarPagina("./interno/modulos/instrumentos_selecionar.html");
 	let conteudoSelecionarInstrumentos = parser.parseFromString(paginaSelecionarInstrumentos,"text/html");
@@ -100,6 +298,7 @@ async function carregarModulo() {
 	//console.log(conteudoDialogo.childNodes[0].childNodes[1].childNodes[0]);
 	//dialogMenuInstrumentos = document.createElement("dialog");
 	//divPartitura.appendChild(divEditor);
+	divMenuTopo.appendChild(dialogoInstrumentos.botao);
 
 	atualizarLoading(-1);
 	dialogoInstrumentos.selecionar();
@@ -107,113 +306,29 @@ async function carregarModulo() {
 	return true;
 }
 
-function gerarInstrumentoListagem(argInstrumento,argAcao = null) {
-	let novaLinha;
-	let novoCampo;
-	novaLinha = document.createElement("tr");
-	let retorno = novaLinha;
-	retorno.onclick = (e)=>{
-		retorno.classList.add("selecionado");
+function exibirInstrumentoListagem(argInstrumento) {
+	if (instrumentoSelecionado!=null) {
+		instrumentoSelecionado.desselecionar();
 	}
-	novoCampo = document.createElement("td");
-	numInstrumento++;
-	novoCampo.innerHTML = "⋮ " + numInstrumento;
-	let pautasAbertas = false;
-	let pautasParaAbrir =[];
-	/*
-	let novoBotao = document.createElement("button");
-	novoBotao.innerHTML = "▸";
-	novoBotao.onclick=(e)=>{
-		pautasAbertas=!pautasAbertas;
-		if (pautasAbertas) {
-			novoBotao.innerHTML = "▾";
-			novoBotao.classList.add("selecionado");
-			pautasParaAbrir.forEach(pauta => {
-				pauta.style.display=null;
-			});
-		} else {
-			novoBotao.innerHTML = "▸";
-			novoBotao.classList.remove("selecionado");
-			pautasParaAbrir.forEach(pauta => {
-				pauta.style.display="none";
-			});
-		}
+	instrumentoSelecionado = argInstrumento;
+	if (instrumentoSelecionado!=null) {
+		instrumentoSelecionado.selecionar();
 	}
-	novoCampo.appendChild(novoBotao);
-	*/
-	novaLinha.draggable = true;
-	novaLinha.appendChild(novoCampo);
-	//Marcação solo
-	
-	//Marcação mudo
-	
-	tableListaInstrumentos.appendChild(novaLinha);
-	let numPauta = 0;
-	argInstrumento.pautas.forEach(pauta => {
-		novaLinha = document.createElement("tr");
-		novoCampo = document.createElement("td");
-		novaLinha.appendChild(novoCampo);
-		novoCampo = document.createElement("td");
-		numPauta++;
-		novoCampo.innerHTML = "Pauta " + numInstrumento + "." + numPauta;
-		novaLinha.appendChild(novoCampo);
-		novoCampo = document.createElement("td");
-		novoCampo.style.textAlign = "center";
-		let novoInputSolo = document.createElement("input");
-		novoInputSolo.type = "checkbox";
-		inputsSolos.push(novoInputSolo);
-		novoInputSolo.onchange = (e)=>{
-			let numInputs = 0;
-			inputsSolos.forEach(inputSolo => {
-				if (inputSolo.checked) { numInputs++ };
-			});
-			if (numInputs == 0) {
-				novoInputSoloPrincipal.checked = false;
-				novoInputSoloPrincipal.indeterminate = false;
-			} else if (numInputs == inputsSolos.length) {
-				novoInputSoloPrincipal.checked = true;
-				novoInputSoloPrincipal.indeterminate = false;
-			} else {
-				novoInputSoloPrincipal.indeterminate = true;
-			}
-		}
-		novoCampo.appendChild(novoInputSolo);
-		novaLinha.appendChild(novoCampo);
-		novoCampo = document.createElement("td");
-		novoCampo.style.textAlign = "center";
-		let novoInputMudo = document.createElement("input");
-		novoInputMudo.type = "checkbox";
-		inputsMudos.push(novoInputMudo);
-		novoInputMudo.onchange = (e)=>{
-			let numInputs = 0;
-			inputsMudos.forEach(inputMudo => {
-				if (inputMudo.checked) { numInputs++ };
-			});
-			if (numInputs == 0) {
-				novoInputMudoPrincipal.checked = false;
-				novoInputMudoPrincipal.indeterminate = false;
-			} else if (numInputs == inputsMudos.length) {
-				novoInputMudoPrincipal.checked = true;
-				novoInputMudoPrincipal.indeterminate = false;
-			} else {
-				novoInputMudoPrincipal.indeterminate = true;
-			}
-		}
-		novoCampo.appendChild(novoInputMudo);
-		novaLinha.appendChild(novoCampo);
-		pautasParaAbrir.push(novaLinha);
-		novaLinha.style.display="none";
-		tableListaInstrumentos.appendChild(novaLinha);
-	});
-	return retorno;
 }
-
 function obterListaInstrumentos() {
-	let headerTabela = tableListaInstrumentos.childNodes[1].childNodes[0];
+	listagemInstrumentos = [];
+	let headerTabelaInstrumentos = tableListaInstrumentos.getElementsByTagName("tr")[0];
+	//Obtem o primeiro elemento tr da tabela tableListaInstrumentos
 	while (tableListaInstrumentos.firstChild) {
 		tableListaInstrumentos.removeChild(tableListaInstrumentos.firstChild);
 	}
-	tableListaInstrumentos.appendChild(headerTabela);
+	tableListaInstrumentos.appendChild(headerTabelaInstrumentos);
+
+	let headerTabelaPautas = tableListaPautas.getElementsByTagName("tr")[0];
+	while (tableListaPautas.firstChild) {
+		tableListaPautas.removeChild(tableListaPautas.firstChild);
+	}
+	tableListaPautas.appendChild(headerTabelaPautas);
 	numInstrumento = 0;
 	instrumentos.forEach(instrumento => {
 		//gerarInstrumentoListagem(instrumento);
@@ -222,6 +337,47 @@ function obterListaInstrumentos() {
 	console.log(listagemInstrumentos);
 }
 
+function aplicarAlteracoesListagem() {
+	//Cria uma nova array de instrumentos:
+	let instrumentosAtualizacao=[];
+	//Varre listagemInstrumentos possui referencia que não seja nula
+	for (let i = 0; i < listagemInstrumentos.length; i++) {
+		if (listagemInstrumentos[i].referencia!=null) {
+			instrumentosAtualizacao.push(listagemInstrumentos[i].referencia);
+			//Reseta o instrumentoAnterior e instrumentoPosterior da referência:
+			listagemInstrumentos[i].referencia.instrumentoAnterior = null;
+			listagemInstrumentos[i].referencia.instrumentoPosterior = null;
+		} else {
+			//Gera uma array com as claves das pautas
+			let pautas = [];
+			instrumento.pautas.forEach(pauta=>{
+				listagemInstrumentos[i].push(pauta.clave);
+			});
+			//Cria um novo instrumento com as informações que estão no objeto:
+			let novoInstrumento = new Instrumento(instrumento.nome,instrumento.abreviatura,pautas);
+			//Adiciona o novo instrumento à array de instrumentos
+			instrumentosAtualizacao.push(novoInstrumento);
+		}
+	}
+	//Atualiza as variáveis instrumentoAnterior e instrumentoPosterior de acordo com os instrumentos de instrumentosAtualizacao:
+	for (let i = 0; i < instrumentosAtualizacao.length; i++) {
+		if (i>0) {
+			instrumentosAtualizacao[i].instrumentoAnterior = instrumentosAtualizacao[i-1];
+		}
+		if (i<instrumentosAtualizacao.length-1) {
+			instrumentosAtualizacao[i].instrumentoPosterior = instrumentosAtualizacao[i+1];
+		}
+	}
+	//Substitui a array de instrumentos pela nova array:
+	instrumentos = instrumentosAtualizacao;
+	//Fecha o diálogo de instrumentos:
+	dialogoInstrumentos.desselecionar();
+	//Renderiza a partitura novamente:
+	renderizarPartitura();
+}
+
+
+//#region Inserção de novos instrumentos
 function obterListagem() {
 	//Categorias
 	while (divInstrumentosListagemCategorias.firstChild) {
@@ -261,7 +417,6 @@ function obterListagem() {
 		divInstrumentosListagemCategorias.appendChild(novaCategoria);
 	})
 }
-
 function gerarBotaoInstrumento(argInstrumento) {
 	let novoBotaoInstrumento = document.createElement("button");
 	let novaImagem = null;
@@ -299,16 +454,18 @@ function gerarBotaoInstrumento(argInstrumento) {
 	descricao += "\nTransposição: " + textoTransposicao + "\n";
 	novoBotaoInstrumento.title=descricao;
 	novoBotaoInstrumento.onclick = (e)=>{
-		let novaLinhaGerada = gerarInstrumentoListagem(argInstrumento,"adicionar");
-		novosInstrumentos.push(argInstrumento);
-		novaLinhaGerada.scrollIntoView({
+		//let novaLinhaGerada = gerarInstrumentoListagem(argInstrumento,"adicionar");
+		let novoInstrumentoGerado = new InstrumentoListagem(argInstrumento.nome,argInstrumento.abreviatura,null,argInstrumento.pautas);
+		novoInstrumentoGerado.el.scrollIntoView({
 			behavior: "smooth",
 			block: "center",
 			inline: "center"
 		});
 		dialogoSelecionarInstrumentos.desselecionar();
+		exibirInstrumentoListagem(novoInstrumentoGerado);
 	}
 	divInstrumentosListagem.appendChild(novoBotaoInstrumento);
 }
+//#endregion
 
 carregarModulo();
