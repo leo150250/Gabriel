@@ -1,0 +1,164 @@
+[
+    {
+        "nome": "Flauta",
+        "abreviatura": "Flt",
+        "pautas": ["G"],
+        "transposicao": 0,
+        "imagem":"🪈",
+        "categoria": [
+            "Sopros",
+            "Chaves"
+        ]
+    },
+    {
+        "nome": "Clarinete Bb",
+        "abreviatura": "ClBb",
+        "pautas": ["G"],
+        "transposicao": 2,
+        "imagem":"",
+        "categoria": [
+            "Sopros",
+            "Palhetas",
+            "Chaves",
+            "Madeiras"
+        ]
+    },
+    {
+        "nome": "Sax Alto",
+        "abreviatura": "SxA",
+        "pautas": ["G"],
+        "transposicao": 3,
+        "imagem":"🎷",
+        "categoria": [
+            "Sopros",
+            "Palhetas",
+            "Chaves",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Sax Tenor",
+        "abreviatura": "SxT",
+        "pautas": ["G"],
+        "transposicao": 2,
+        "imagem":"🎷",
+        "categoria": [
+            "Sopros",
+            "Palhetas",
+            "Chaves",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Sax Barítono",
+        "abreviatura": "SxB",
+        "pautas": ["G"],
+        "transposicao": 3,
+        "imagem":"🎷",
+        "categoria": [
+            "Sopros",
+            "Palhetas",
+            "Chaves",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Trompete Bb",
+        "abreviatura": "TptBb",
+        "pautas": ["G"],
+        "transposicao": 2,
+        "imagem":"🎺",
+        "categoria": [
+            "Sopros",
+            "Bocais",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Trombone",
+        "abreviatura": "Trb",
+        "pautas": ["F"],
+        "transposicao": 0,
+        "imagem":"",
+        "categoria": [
+            "Sopros",
+            "Bocais",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Tuba",
+        "abreviatura": "Tb",
+        "pautas": ["F"],
+        "transposicao": 0,
+        "imagem":"",
+        "categoria": [
+            "Sopros",
+            "Bocais",
+            "Metais"
+        ]
+    },
+    {
+        "nome": "Piano",
+        "abreviatura": "Pno",
+        "pautas": ["G", "F"],
+        "transposicao": 0,
+        "imagem":"🎹",
+        "categoria": [
+            "Teclas",
+            "Base"
+        ]
+    },
+    {
+        "nome": "Violino",
+        "abreviatura": "Vln",
+        "pautas": ["G"],
+        "transposicao": 0,
+        "imagem":"🎻",
+        "categoria": [
+            "Cordas"
+        ]
+    },
+    {
+        "nome": "Viola",
+        "abreviatura": "Vla",
+        "pautas": ["C"],
+        "transposicao": 0,
+        "imagem":"🎻",
+        "categoria": [
+            "Cordas"
+        ]
+    },
+    {
+        "nome": "Violoncelo",
+        "abreviatura": "Vlc",
+        "pautas": ["F"],
+        "transposicao": 0,
+        "imagem":"🎻",
+        "categoria": [
+            "Cordas"
+        ]
+    },
+    {
+        "nome": "Baixo",
+        "abreviatura": "Bx",
+        "pautas": ["F"],
+        "transposicao": 0,
+        "imagem":"🎻",
+        "categoria": [
+            "Cordas"
+        ]
+    },
+    {
+        "nome": "Trompa",
+        "abreviatura": "Tp",
+        "pautas": ["G"],
+        "transposicao": 1,
+        "imagem":"📯",
+        "categoria": [
+            "Sopros",
+            "Bocais",
+            "Metais"
+        ]
+    }
+]

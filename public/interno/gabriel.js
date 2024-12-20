@@ -18,7 +18,32 @@ var andamento = [4,4];
 var tom = 0;
 var elementoSelecionado = null;
 var menus = [];
+var dialogos = [];
+
 var indiceCarregamento = 1;
+//Exibir erro de inicialização caso aconteça algum erro durante o carregamento da página
+function atualizarLoading(argContador=0) {
+	indiceCarregamento+=parseInt(argContador);
+	if (indiceCarregamento==0) {
+		divLoader.style.opacity = 0;
+		divLoader.style.pointerEvents="none";
+	} else {
+		//console.log("LOADING " + indiceCarregamento);
+	}
+}
+function textoLoading(argTexto) {
+	pLoader.innerHTML = argTexto;
+}
+window.addEventListener('error', function (e) {
+	//console.log(e);
+	textoLoading(e.message);
+	atualizarLoading(1);
+});
+window.addEventListener('unhandledrejection', function (e) {
+	//console.log(e);
+	textoLoading(e.reason);
+	atualizarLoading(1);
+});
 //#endregion
 
 
@@ -73,6 +98,38 @@ const AlturasPx = {
 
 
 //#region Classes
+class Dialogo {
+	constructor(argNome,argTextoBotao,argElementoDialogo,argFuncaoCallback = null) {
+		this.selecionado = false;
+		this.elementoDialogo = argElementoDialogo;
+		this.botao = document.createElement("button");
+		this.botao.innerHTML = argTextoBotao;
+		this.botao.title = argNome;
+		this.botao.onclick = ()=>{
+			exibirDialogo(this);
+			this.botao.blur();
+		}
+		this.funcaoCallback = argFuncaoCallback;
+		document.body.appendChild(this.elementoDialogo);
+		dialogos.push(this);
+	}
+	selecionar() {
+		if (!this.selecionado) {
+			this.selecionado = true;
+			this.elementoDialogo.showModal();
+			if (this.funcaoCallback!=null) {
+				this.funcaoCallback.apply(this,arguments);
+			}
+		}
+	}
+	desselecionar() {
+		if (this.selecionado) {
+			this.selecionado = false;
+			this.elementoDialogo.close();
+		}
+	}
+}
+
 class Menu {
 	constructor(argNome,argTextoBotao,argElementoMenu,argFuncaoCallback = null) {
 		this.selecionado = false;
@@ -693,13 +750,14 @@ class Pauta {
 }
 
 class Instrumento {
-	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null) {
+	constructor(argNome,argAbrev,argPautas=[],argInstrumentoAnterior = null,argNotacao = "comum",argTransposicao = 0) {
 		this.nome = "";
 		this.abreviatura = "";
 		this.el_nome = document.createElement("div");
 		this.atualizarNome(argNome, argAbrev);
 		this.pautas = [];
-		this.transposicao = 0;
+		this.notacao = argNotacao;
+		this.transposicao = argTransposicao;
 		this.instrumentoAnterior = argInstrumentoAnterior;
 		this.instrumentoPosterior = null;
 		if (this.instrumentoAnterior != null) {
@@ -739,6 +797,13 @@ class Instrumento {
 	}
 	obterUltimaPauta() {
 		return this.pautas[this.pautas.length - 1];
+	}
+	obterListagemPautas() {
+		let listagemPautas = [];
+		this.pautas.forEach(pauta=>{
+			listagemPautas.push(pauta.clavePadrao);
+		});
+		return listagemPautas;
 	}
 }
 
@@ -995,21 +1060,42 @@ function exibirMenu(argMenu) {
 	}
 }
 
-function exibirMenuPrincipal() {
-	divMenuPrincipal.toggleAttribute("exibir");
-}
-
-function atualizarLoading(argContador=0) {
-	indiceCarregamento+=parseInt(argContador);
-	if (indiceCarregamento==0) {
-		divLoader.style.opacity = 0;
-		divLoader.style.pointerEvents="none";
-	} else {
-		//console.log("LOADING " + indiceCarregamento);
+function exibirDialogo(argDialogo) {
+	if (typeof argDialogo == "object") {
+		argDialogo.selecionar();
+	} else if (typeof argDialogo == "string") {
+		let achei = false;
+		dialogos.forEach(dialogo=>{
+			if (dialogo.elementoDialogo.id == argDialogo) {
+				achei = true;
+				exibirDialogo(dialogo);
+			}
+		});
+		if (!achei) {
+			console.log("Não encontrei o diálogo: " + argDialogo);
+		}
 	}
 }
-function textoLoading(argTexto) {
-	pLoader.innerHTML = argTexto;
+
+function fecharDialogo(argDialogo) {
+	if (typeof argDialogo == "object") {
+		argDialogo.desselecionar();
+	} else if (typeof argDialogo == "string") {
+		let achei = false;
+		dialogos.forEach(dialogo=>{
+			if (dialogo.elementoDialogo.id == argDialogo) {
+				achei = true;
+				fecharDialogo(dialogo);
+			}
+		});
+		if (!achei) {
+			console.log("Não encontrei o diálogo: " + argDialogo);
+		}
+	}
+}
+
+function exibirMenuPrincipal() {
+	divMenuPrincipal.toggleAttribute("exibir");
 }
 //#endregion
 
@@ -1038,18 +1124,9 @@ document.body.addEventListener("keydown",(e)=>{
 document.body.onload = (e)=>{
 	atualizarLoading(-1);
 };
-document.addEventListener('error', function(event) {
-	textoLoading("ERRO: " + event.message);
-    console.log('Captured error:', event.message);
-    console.log('Source:', event.filename);
-    console.log('Line:', event.lineno);
-    console.log('Column:', event.colno);
-    console.log('Error object:', event.error);
-},true);
 //#endregion
 
 
-
-
-testarPartitura();
 importarModulo("editor");
+importarModulo("instrumentos");
+//testarPartitura();

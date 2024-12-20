@@ -1,0 +1,19 @@
+<dialog id="dialogoInstrumentosSelecionar">
+	<h1>Selecione seu instrumento</h1>
+	<span class="form">
+		<label for="inputBuscaInstrumento">Buscar:</label>
+		<input type="search" id="inputBuscaInstrumento" placeholder="Digite o nome do instrumento..." oninput="buscarInstrumentos()">
+	</span>
+	<div class="listagem">
+		<div id="instrumentosListagemCategorias">
+			<button>Categoria 1</button>
+			<button>Categoria 2</button>
+			<button>Categoria 3</button>
+		</div>
+		<div id="instrumentosListagem"></div>
+	</div>
+	<div class="botoes">
+		<button type="button" title="Descartar alterações e retornar" onclick="fecharDialogo('dialogoInstrumentosSelecionar')">Cancelar</button>
+		<div class="espacador"></div>
+	</div>
+</dialog>

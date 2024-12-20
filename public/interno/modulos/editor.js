@@ -1,13 +1,13 @@
 //import {default as Gabriel} from "./../gabriel.js";
 var divMenuEdicao = null;
-var nomeModulo = "Editor";
-var botaoModulo = "✍";
 var menuModulo = null;
 
 var buttonPausa = null;
 
 async function carregarModulo() {
 	atualizarLoading(1);
+	let nomeModulo = "Editor";
+	let botaoModulo = "✍";
 	//console.log(Gabriel);
 	let parser = new DOMParser();
 	let paginaModulo = await carregarPagina("./interno/modulos/editor.html");
@@ -25,7 +25,7 @@ async function carregarModulo() {
 	atualizarEditor();
 	selecionarDuracao(Duracoes.COLCHEIA);
 	atualizarLoading(-1);
-	menuModulo.selecionar();
+	//menuModulo.selecionar();
 	return true;
 }
 

@@ -12,6 +12,7 @@
 .espacador {
     margin-right: 1px;
     flex-grow: 2;
+    width: auto;
 }
 html {
     width: 100%;
@@ -27,7 +28,7 @@ body {
     overflow: hidden;
 }
 
-button, input {
+button {
     outline: none;
     padding: 10px;
     border: none;
@@ -37,34 +38,195 @@ button, input {
     min-height: 3rem;
     min-width: 3rem;
     margin-right: 1px;
-    &[type="number"] {
-        border-bottom: 5px solid var(--azulClaro);
-        box-sizing: border-box;
-    }
 }
-button:hover, input[type="number"]:hover {
+button:hover, input:is([type="number"],[type="search"],[type="text"]):hover, select:hover, tr:hover td {
     background-color: #EEE;
 }
-input[type="number"]:focus {
-    border-bottom: 5px solid var(--azul);
-}
-button.selecionado {
+button.selecionado, tr.selecionado td {
     background-color: var(--azulClaro);
 }
 button:active {
     color: #FFF;
     background-color: var(--azul);
 }
+button.estreito {
+    padding: 5px;
+    min-height: 1rem;
+    min-width: 1rem;
+}
+button.ok {
+    border: 2px solid var(--azul);
+}
 button img {
     pointer-events: none;
 }
 label{
-    padding: 10px;
     vertical-align: baseline;
     align-self: center;
 }
 label:has(+input) {
     text-align: right;
+}
+input:is([type="number"],[type="search"],[type="text"]), select {
+    outline: none;
+    padding: 5px;
+    border: none;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 1px;
+    padding-bottom: 0px;
+    border-bottom: 2px solid var(--azulClaro);
+    box-sizing: border-box;
+}
+input:is([type="number"],[type="search"],[type="text"]):focus, select:focus {
+    border-bottom: 2px solid var(--azul);
+}
+input:disabled, select:disabled {
+    background-color: #EEE;
+    border-bottom: 2px solid #CCC;
+}
+select option {
+    background-color: #FFF;
+}
+h1, h2, h3, h4, h5, h6 {
+    margin: 0em;
+    padding: 0.5em 0.5em;
+}
+div.scroll {
+    overflow-y: scroll;
+    border-bottom: 1px solid var(--azul);
+    align-content: start;
+}
+dialog {
+    border: none;
+    box-shadow: 0px 4px 8px #0004;
+    border-radius: 4px;
+    padding: 0rem 1rem;
+    outline: none;
+}
+dialog::backdrop {
+    background-color: var(--azulSelecao);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+}
+dialog h1 {
+    background-color: var(--azul);
+    color: #FFF;
+    margin: 0rem -1rem;
+}
+dialog table {
+    width: 100%;
+}
+dialog .botoes {
+    background-color: #EEE;
+    border-top: 1px solid #CCC;
+    display: flex;
+    flex-direction: row-reverse;
+    margin: 0rem -1rem;
+}
+dialog div {
+    display: flex;
+    flex-wrap: wrap;
+}
+dialog div > div {
+    width: 100%;
+}
+dialog div:has(> span.form) {
+    flex-direction: column;
+    margin-bottom: 0.5rem;
+}
+dialog div.listagem {
+    display: flex;
+    width: calc(100vw - 5em);
+    height: calc(100vh - 20em);
+    flex-wrap: nowrap;
+    margin: 0rem -1rem;
+}
+dialog div.listagem div:first-child {
+    flex-basis: 20em;
+    flex-shrink: 2;
+    border-right: 1px solid var(--azul);
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+}
+dialog div.listagem div:nth-child(2) {
+    flex-grow: 2;
+    overflow-y: scroll;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-rows: repeat(auto-fit, 200px);
+    gap: 1px;
+    padding: 1px;
+    align-items: start;
+    background-color: #E8E8E8;
+    button {
+        height: 200px;
+        margin-right: 0px;
+        img, span {
+            font-size: 5em;
+        }
+    }
+}
+dialog div.scroll {
+    margin: 0rem -1rem;
+}
+table {
+    position: relative;
+    border-spacing: 0px;
+    border-bottom: 1px solid var(--azul);
+}
+div.scroll table {
+    border-bottom: none;
+}
+table tr.sticky {
+    position: sticky;
+    top: 0px;
+}
+table tr.dragOver {
+    height: 1rem;
+    box-sizing: border-box;
+    position: absolute;
+    width: 100%;
+    margin: -0.5rem 0rem;
+    opacity: 0;
+    background-color: var(--azulSelecao);
+    border-left: groove 2px var(--azulSelecao);
+    border-right: groove 2px var(--azulSelecao);
+}
+
+table tr.dragOver.onDrag {
+    opacity: 1;
+    cursor: grabbing;
+}
+table tr.dragOver.onDrag hr {
+    pointer-events: none;
+    border-color: var(--azulSelecao);
+}
+table th {
+    background-color: #DDD;
+    min-width: 2em;
+    padding: 0.5em;
+}
+table td {
+    padding: 0.5em;
+    border-bottom: 1px solid #DDD;
+    box-sizing: border-box;
+    width: inherit;
+}
+span.form {
+    display: flex;
+    flex-grow: 2;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+span.form label {
+    margin: 0.5rem 0rem;
+}
+span.form input, span.form select {
+    flex-grow: 2;
+    margin-left: -1rem;
 }
 
 #loader {
@@ -132,7 +294,7 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
     flex-grow: 2;
     align-self: stretch;
 }
-#menuPrincipal div button {
+#menuPrincipal div button, dialog div.listagem div:first-child button {
     text-align: left;
     margin-top: 1px;
 }
