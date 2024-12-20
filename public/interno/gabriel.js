@@ -1129,4 +1129,4 @@ document.body.onload = (e)=>{
 
 importarModulo("editor");
 importarModulo("instrumentos");
-testarPartitura();
+//testarPartitura();
