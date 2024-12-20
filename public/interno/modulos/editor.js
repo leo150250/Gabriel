@@ -4,7 +4,7 @@ var menuModulo = null;
 
 var buttonPausa = null;
 
-async function carregarModulo() {
+async function carregarModulo_editor() {
 	atualizarLoading(1);
 	let nomeModulo = "Editor";
 	let botaoModulo = "✍";
@@ -395,4 +395,4 @@ document.body.addEventListener("keydown",(e)=>{
 	}
 });
 
-carregarModulo();
+carregarModulo_editor();

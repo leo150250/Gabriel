@@ -19,6 +19,7 @@ var tom = 0;
 var elementoSelecionado = null;
 var menus = [];
 var dialogos = [];
+var bpm = 120;
 
 var indiceCarregamento = 1;
 //Exibir erro de inicialização caso aconteça algum erro durante o carregamento da página
@@ -1129,4 +1130,5 @@ document.body.onload = (e)=>{
 
 importarModulo("editor");
 importarModulo("instrumentos");
-//testarPartitura();
+importarModulo("audio");
+testarPartitura();

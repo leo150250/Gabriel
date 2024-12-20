@@ -277,7 +277,7 @@ class InstrumentoListagem {
 	}
 }
 
-async function carregarModulo() {
+async function carregarModulo_instrumentos() {
 	atualizarLoading(1);
 	let nomeModulo = "Instrumentos";
 	let botaoModulo = "🎹";
@@ -319,8 +319,8 @@ async function carregarModulo() {
 	inputBuscaInstrumento = document.getElementById("inputBuscaInstrumento");
 
 	atualizarLoading(-1);
-	dialogoInstrumentos.selecionar();
-	dialogoSelecionarInstrumentos.selecionar();
+	//dialogoInstrumentos.selecionar();
+	//dialogoSelecionarInstrumentos.selecionar();
 	return true;
 }
 
@@ -532,4 +532,4 @@ function buscarInstrumentos() {
 }
 //#endregion
 
-carregarModulo();
+carregarModulo_instrumentos();
