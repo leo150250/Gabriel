@@ -1,7 +1,9 @@
 <dialog id="dialogoInstrumentosSelecionar">
 	<h1>Selecione seu instrumento</h1>
-	<label for="inputBuscaInstrumento">Buscar:</label>
-	<input type="search" id="inputBuscaInstrumento" placeholder="Digite o nome do instrumento...">
+	<span class="form">
+		<label for="inputBuscaInstrumento">Buscar:</label>
+		<input type="search" id="inputBuscaInstrumento" placeholder="Digite o nome do instrumento..." oninput="buscarInstrumentos()">
+	</span>
 	<div class="listagem">
 		<div id="instrumentosListagemCategorias">
 			<button>Categoria 1</button>

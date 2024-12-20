@@ -13,6 +13,7 @@ var divInstrumentosListagemCategorias = null;
 var divInstrumentosListagem = null;
 var categoriaSelecionada = null;
 var listagemInstrumentos = [];
+var inputBuscaInstrumento = null;
 
 var inputInstrumentoNome = null;
 var inputInstrumentoAbreviatura = null;
@@ -315,9 +316,11 @@ async function carregarModulo() {
 	inputInstrumentoTipoNotacao = document.getElementById("dialogInstrumentos_tipoNotacaoInstrumento");
 	inputInstrumentoTransposicao = document.getElementById("dialogInstrumentos_transposicaoInstrumento");
 
+	inputBuscaInstrumento = document.getElementById("inputBuscaInstrumento");
+
 	atualizarLoading(-1);
 	dialogoInstrumentos.selecionar();
-	//dialogoSelecionarInstrumentos.selecionar();
+	dialogoSelecionarInstrumentos.selecionar();
 	return true;
 }
 
@@ -516,6 +519,16 @@ function gerarBotaoInstrumento(argInstrumento) {
 		exibirInstrumentoListagem(novoInstrumentoGerado);
 	}
 	divInstrumentosListagem.appendChild(novoBotaoInstrumento);
+}
+function buscarInstrumentos() {
+	while (divInstrumentosListagem.firstChild) {
+		divInstrumentosListagem.removeChild(divInstrumentosListagem.firstChild);
+	}
+	jsonInstrumentos.forEach(instrumento => {
+		if (instrumento.nome.toLowerCase().includes(inputBuscaInstrumento.value.toLowerCase())) {
+			gerarBotaoInstrumento(instrumento);
+		}
+	});
 }
 //#endregion
 

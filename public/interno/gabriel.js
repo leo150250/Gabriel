@@ -19,7 +19,31 @@ var tom = 0;
 var elementoSelecionado = null;
 var menus = [];
 var dialogos = [];
+
 var indiceCarregamento = 1;
+//Exibir erro de inicialização caso aconteça algum erro durante o carregamento da página
+function atualizarLoading(argContador=0) {
+	indiceCarregamento+=parseInt(argContador);
+	if (indiceCarregamento==0) {
+		divLoader.style.opacity = 0;
+		divLoader.style.pointerEvents="none";
+	} else {
+		//console.log("LOADING " + indiceCarregamento);
+	}
+}
+function textoLoading(argTexto) {
+	pLoader.innerHTML = argTexto;
+}
+window.addEventListener('error', function (e) {
+	//console.log(e);
+	textoLoading(e.message);
+	atualizarLoading(1);
+});
+window.addEventListener('unhandledrejection', function (e) {
+	//console.log(e);
+	textoLoading(e.reason);
+	atualizarLoading(1);
+});
 //#endregion
 
 
@@ -1073,19 +1097,6 @@ function fecharDialogo(argDialogo) {
 function exibirMenuPrincipal() {
 	divMenuPrincipal.toggleAttribute("exibir");
 }
-
-function atualizarLoading(argContador=0) {
-	indiceCarregamento+=parseInt(argContador);
-	if (indiceCarregamento==0) {
-		divLoader.style.opacity = 0;
-		divLoader.style.pointerEvents="none";
-	} else {
-		//console.log("LOADING " + indiceCarregamento);
-	}
-}
-function textoLoading(argTexto) {
-	pLoader.innerHTML = argTexto;
-}
 //#endregion
 
 
@@ -1113,19 +1124,9 @@ document.body.addEventListener("keydown",(e)=>{
 document.body.onload = (e)=>{
 	atualizarLoading(-1);
 };
-document.addEventListener('error', function(event) {
-	textoLoading("ERRO: " + event.message);
-    console.log('Captured error:', event.message);
-    console.log('Source:', event.filename);
-    console.log('Line:', event.lineno);
-    console.log('Column:', event.colno);
-    console.log('Error object:', event.error);
-});
 //#endregion
 
 
-
-
-testarPartitura();
 importarModulo("editor");
 importarModulo("instrumentos");
+testarPartitura();
