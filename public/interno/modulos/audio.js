@@ -13,6 +13,8 @@ const FrequenciasNotas = {
 var compassoExecucao = 0;
 var buttonExecutar = null;
 var buttonParar = null;
+var divBarraPlayer = document.createElement("div");
+divBarraPlayer.classList.add("barraPlayer");
 
 async function carregarModulo_audio() {
 	atualizarLoading(1);
@@ -25,6 +27,13 @@ async function carregarModulo_audio() {
 		}
 		playNoteWithMIDISynth(FrequenciasNotas[this.altura], 127, this.oitava, duracaoFigura);
 	}
+
+	let novoEstilo = document.createElement("link");
+	novoEstilo.rel = "stylesheet";
+	novoEstilo.href = "interno/modulos/audio.css";
+	novoEstilo.type = "text/css";
+	document.head.appendChild(novoEstilo);
+
 	buttonExecutar = document.createElement("button");
 	buttonExecutar.onclick = executarPartitura;
 	buttonExecutar.innerHTML = "▶";
@@ -33,6 +42,10 @@ async function carregarModulo_audio() {
 	buttonParar.innerHTML = "⏹";
 	divMenuTopo.appendChild(buttonExecutar);
 	divMenuTopo.appendChild(buttonParar);
+
+	divPartitura.appendChild(divBarraPlayer);
+	posicionarBarraPlayer(0);
+
 	await navigator.requestMIDIAccess({sysex:true,software:true}).then(onMIDISuccess, onMIDIFailure);
 	playNoteWithMIDISynth(FrequenciasNotas.C, 10, 3, 0.2);
 	await new Promise(r => setTimeout(r, 100));
@@ -136,6 +149,14 @@ function executarCompassos() {
 	let sistemaAtual = sistemas[compassoExecucao];
 	let duracaoCompasso = tempo * sistemaAtual.compassos[0].andamento[0];
 	execucaoPartitura = setTimeout(executarCompassos, duracaoCompasso * 1000);
+	let posicaoInicialBarra = posicionarBarraPlayer(compassoExecucao);
+	divBarraPlayer.style.transitionDuration = duracaoCompasso + "s";
+	//Obtém a largura de cada divisão do compasso do sistema atual:
+	let larguraCompasso = 0;
+	sistemaAtual.compassos[0].divisoes.forEach(divisao => {
+		larguraCompasso += divisao.el.offsetWidth;
+	});
+	divBarraPlayer.style.left = (posicaoInicialBarra + larguraCompasso) + "px";
 	//console.log(compassoExecucao);
 	sistemaAtual.compassos.forEach(compasso => {
 		let inicioDivisao = 0;
@@ -158,7 +179,23 @@ function executarCompassos() {
 }
 
 function pararPartitura() {
+	posicionarBarraPlayer(0);
 	clearTimeout(execucaoPartitura);
+}
+
+function posicionarBarraPlayer(argSistema) {
+	//Obtém o elemento do sistema de argSistema:
+	let sistemaAtual = sistemas[argSistema];
+	//Posiciona o divBarraPlayer no início do sistema:
+	let posicaoX = 0;
+	posicaoX += sistemaAtual.el.offsetLeft;
+	posicaoX += sistemaAtual.compassos[0].el.offsetLeft;
+	posicaoX += sistemaAtual.compassos[0].obterPrimeiraDivisao(false).el.offsetLeft;
+	console.log(posicaoX);
+	divBarraPlayer.style.transitionDuration = "0s";
+	divBarraPlayer.style.left = posicaoX + "px";
+	divBarraPlayer.style.top = sistemaAtual.el.y + "px";
+	return posicaoX;
 }
 
 carregarModulo_audio();
