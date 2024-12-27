@@ -11,6 +11,8 @@ const FrequenciasNotas = {
 };
 
 var compassoExecucao = 0;
+var buttonExecutar = null;
+var buttonParar = null;
 
 async function carregarModulo_audio() {
 	atualizarLoading(1);
@@ -23,6 +25,14 @@ async function carregarModulo_audio() {
 		}
 		playNoteWithMIDISynth(FrequenciasNotas[this.altura], 127, this.oitava, duracaoFigura);
 	}
+	buttonExecutar = document.createElement("button");
+	buttonExecutar.onclick = executarPartitura;
+	buttonExecutar.innerHTML = "▶";
+	buttonParar = document.createElement("button");
+	buttonParar.onclick = pararPartitura;
+	buttonParar.innerHTML = "⏹";
+	divMenuTopo.appendChild(buttonExecutar);
+	divMenuTopo.appendChild(buttonParar);
 	await navigator.requestMIDIAccess({sysex:true,software:true}).then(onMIDISuccess, onMIDIFailure);
 	playNoteWithMIDISynth(FrequenciasNotas.C, 10, 3, 0.2);
 	await new Promise(r => setTimeout(r, 100));
@@ -36,7 +46,6 @@ async function carregarModulo_audio() {
 	//playNoteWithMIDISynth(FrequenciasNotas.G, 127);
 	//playNoteWithMIDISynth(FrequenciasNotas.A, 127);
 	//playNoteWithMIDISynth(FrequenciasNotas.B, 127);
-	executarPartitura();
 	atualizarLoading(-1);
 	return true;
 }
@@ -66,9 +75,9 @@ function playNoteWithMIDISynth(note, velocity, oitava, argDuracao) {
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
 
-	const somPiano = [0, 1, 0.5, 0.25, 0.125, 0.0625];
+	const somOnda = [0, 1, 0.5, 0.25, 0.125, 0.0625]; //Piano
 
-    oscillator.setPeriodicWave(context.createPeriodicWave(somPiano, new Float32Array(somPiano.length))); // Define a forma de onda da nota
+    oscillator.setPeriodicWave(context.createPeriodicWave(somOnda, new Float32Array(somOnda.length))); // Define a forma de onda da nota
 	const frequencia = note * Math.pow(2, oitava - 3);
     oscillator.frequency.setValueAtTime(frequencia, context.currentTime); // Define a frequência da nota
     gainNode.gain.setValueAtTime(velocity / 127, context.currentTime); // Define a intensidade da nota
@@ -146,6 +155,10 @@ function executarCompassos() {
 		});
 	});
 	compassoExecucao++;
+}
+
+function pararPartitura() {
+	clearTimeout(execucaoPartitura);
 }
 
 carregarModulo_audio();
