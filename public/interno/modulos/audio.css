@@ -1,7 +1,7 @@
 .barraPlayer {
 	position: absolute;
-	width: 2px;
-	background-color: #F00;
-	height: 100%;
+	width: 1px;
+	background-color: var(--azul);
+	box-shadow: 0px 0px 2px 1px var(--azul);
 	transition-timing-function: linear;
 }

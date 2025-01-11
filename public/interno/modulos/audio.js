@@ -11,21 +11,32 @@ const FrequenciasNotas = {
 };
 
 var compassoExecucao = 0;
-var buttonExecutar = null;
-var buttonParar = null;
+var buttonExecutar = document.createElement("button");
+buttonExecutar.onclick = executarPartitura;
+buttonExecutar.innerHTML = "▶";
+var buttonParar = document.createElement("button");
+buttonParar.onclick = pararPartitura;
+buttonParar.innerHTML = "⏹";
 var divBarraPlayer = document.createElement("div");
 divBarraPlayer.classList.add("barraPlayer");
 
 async function carregarModulo_audio() {
 	atualizarLoading(1);
+
 	Figura.prototype.executarNota = function() {
-		console.log(this);
+		//console.log(this);
 		let tempo = 60 / bpm;
 		let duracaoFigura = this.figura * tempo;
 		if (this.sincopa != null) {
 			duracaoFigura += this.sincopa.figura * tempo;
 		}
 		playNoteWithMIDISynth(FrequenciasNotas[this.altura], 127, this.oitava, duracaoFigura);
+	}
+	var FiguraConstructor_audio = Figura.prototype.constructor;
+	Figura.prototype.constructor = function() {
+		FiguraConstructor_audio.apply(this, arguments);
+		this.executarNota();
+		console.log("AEEEHOOOOO");
 	}
 
 	let novoEstilo = document.createElement("link");
@@ -34,12 +45,6 @@ async function carregarModulo_audio() {
 	novoEstilo.type = "text/css";
 	document.head.appendChild(novoEstilo);
 
-	buttonExecutar = document.createElement("button");
-	buttonExecutar.onclick = executarPartitura;
-	buttonExecutar.innerHTML = "▶";
-	buttonParar = document.createElement("button");
-	buttonParar.onclick = pararPartitura;
-	buttonParar.innerHTML = "⏹";
 	divMenuTopo.appendChild(buttonExecutar);
 	divMenuTopo.appendChild(buttonParar);
 
@@ -195,6 +200,7 @@ function posicionarBarraPlayer(argSistema) {
 	divBarraPlayer.style.transitionDuration = "0s";
 	divBarraPlayer.style.left = posicaoX + "px";
 	divBarraPlayer.style.top = sistemaAtual.el.y + "px";
+	divBarraPlayer.style.height = sistemaAtual.el.offsetHeight + "px";
 	return posicaoX;
 }
 
