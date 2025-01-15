@@ -185,6 +185,18 @@ body:has(> #menuPrincipal[exibir]) #wrapper {
 	z-index: 0;
 }
 
+.sistema .regua {
+    position: sticky;
+    top: 0px;
+    background-color: #EEE;
+    width: 100%;
+    border-right: 1px solid #CCC;
+    text-align: center;
+    box-sizing: border-box;
+    z-index: 10;
+    box-shadow: 0px 0px 8px #0004;
+}
+
 .instrumento {
     margin-bottom: 20px;
 	background-color: #F00;

@@ -744,11 +744,18 @@ class Instrumento {
 
 class Sistema {
 	constructor() {
+		this.compassos = [];
+		this.numero = sistemas.length;
+		this.largura = 0;
+
 		this.el = document.createElement("div");
 		this.el.classList.add("sistema");
-		this.compassos = [];
+		this.el_regua = document.createElement("div");
+		this.el_regua.innerHTML = this.numero + 1;
+		this.el_regua.classList.add("regua");
+		this.el.appendChild(this.el_regua);
+		
 		sistemas.push(this);
-		this.largura = this.el.offsetWidth;
 	}
 	atualizar() {
 		//console.log("Atualizar sistema");
