@@ -1,4 +1,5 @@
 var MIDI = null;
+var contextAudio = new (window.AudioContext || window.webkitAudioContext)();
 
 const FrequenciasNotas = {
 	C: 261.63,
@@ -23,7 +24,7 @@ divBarraPlayer.classList.add("barraPlayer");
 async function carregarModulo_audio() {
 	atualizarLoading(1);
 
-	Figura.prototype.executarNota = function() {
+	Figura.prototype.executarNota = function(argAmostra=false) {
 		//console.log(this);
 		let tempo = 60 / bpm;
 		let duracaoFigura = this.figura * tempo;
@@ -35,7 +36,7 @@ async function carregarModulo_audio() {
 	var FiguraConstructor_audio = Figura.prototype.constructor;
 	Figura.prototype.constructor = function() {
 		FiguraConstructor_audio.apply(this, arguments);
-		this.executarNota();
+		this.executarNota(true);
 		console.log("AEEEHOOOOO");
 	}
 
@@ -88,26 +89,34 @@ function sendMiddleC(portID) {
 	output.send(noteOnMessage); // sends the message
 }  
 
+var notasEmExecucao = [];
 function playNoteWithMIDISynth(note, velocity, oitava, argDuracao) {
-    const context = new (window.AudioContext || window.webkitAudioContext)();
-    const oscillator = context.createOscillator();
-    const gainNode = context.createGain();
+    const oscillator = contextAudio.createOscillator();
+    const gainNode = contextAudio.createGain();
 
 	const somOnda = [0, 1, 0.5, 0.25, 0.125, 0.0625]; //Piano
 
-    oscillator.setPeriodicWave(context.createPeriodicWave(somOnda, new Float32Array(somOnda.length))); // Define a forma de onda da nota
-	const frequencia = note * Math.pow(2, oitava - 3);
-    oscillator.frequency.setValueAtTime(frequencia, context.currentTime); // Define a frequência da nota
-    gainNode.gain.setValueAtTime(velocity / 127, context.currentTime); // Define a intensidade da nota
-	//gainNode.gain.setValueAtTime(0, context.currentTime + 0.1); // Define a intensidade da nota
-	gainNode.gain.linearRampToValueAtTime(0, context.currentTime + argDuracao); // Define a intensidade da nota
+    oscillator.setPeriodicWave(contextAudio.createPeriodicWave(somOnda, new Float32Array(somOnda.length))); // Define a forma de onda da nota
+	let frequencia = note * Math.pow(2, oitava - 3);
+    oscillator.frequency.setValueAtTime(frequencia, contextAudio.currentTime); // Define a frequência da nota
+    gainNode.gain.setValueAtTime(velocity / 127, contextAudio.currentTime); // Define a intensidade da nota
+	gainNode.gain.linearRampToValueAtTime(0, contextAudio.currentTime + argDuracao); // Define a intensidade da nota
 
     oscillator.connect(gainNode);
-    gainNode.connect(context.destination);
+    gainNode.connect(contextAudio.destination);
 
     oscillator.start();
-    oscillator.stop(context.currentTime + argDuracao); // Toca a nota por 1 segundo
-	return true;
+    oscillator.stop(contextAudio.currentTime + argDuracao); // Toca a nota por 1 segundo
+	notasEmExecucao.push(oscillator);
+	setTimeout((e) => {
+		console.log("Parou!");
+		notasEmExecucao.forEach((nota, index) => {
+			if (nota === oscillator) {
+				notasEmExecucao.splice(index, 1);
+			}
+		});
+	}, argDuracao * 1000);
+	return oscillator;
 }
 
 function obterAcessoMIDI() {
@@ -149,6 +158,7 @@ function executarPartitura() {
 	executarCompassos();
 }
 
+var execucoesCompasso = [];
 function executarCompassos() {
 	let tempo = 60 / bpm;
 	let sistemaAtual = sistemas[compassoExecucao];
@@ -163,20 +173,20 @@ function executarCompassos() {
 	});
 	divBarraPlayer.style.left = (posicaoInicialBarra + larguraCompasso) + "px";
 	//console.log(compassoExecucao);
+	execucoesCompasso = [];
 	sistemaAtual.compassos.forEach(compasso => {
 		let inicioDivisao = 0;
-		let execucaoCompasso = null;
 		compasso.divisoes.forEach(divisao => {
 			let duracaoDivisao = tempo * divisao.tempos;
 			//console.log(inicioDivisao);
-			execucaoCompasso = setTimeout(() => {
+			execucoesCompasso.push(setTimeout(() => {
 				divisao.figuras.forEach(figura => {
 					if ((!figura.pausa)
 					&& (figura.sincopada == null)) {
 						figura.executarNota();
 					}
 				});
-			}, inicioDivisao * 1000);
+			}, inicioDivisao * 1000));
 			inicioDivisao += duracaoDivisao;
 		});
 	});
@@ -186,6 +196,13 @@ function executarCompassos() {
 function pararPartitura() {
 	posicionarBarraPlayer(0);
 	clearTimeout(execucaoPartitura);
+	execucoesCompasso.forEach(execucaoCompasso=>{
+		clearTimeout(execucaoCompasso);
+	});
+	notasEmExecucao.forEach(notaEmExecucao=>{
+		notaEmExecucao.stop();
+	});
+	notasEmExecucao=[];
 }
 
 function posicionarBarraPlayer(argSistema) {
