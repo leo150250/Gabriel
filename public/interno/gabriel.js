@@ -22,15 +22,25 @@ var dialogos = [];
 var bpm = 120;
 
 var indiceCarregamento = 1;
+var funcoesAposLoading = [];
 //Exibir erro de inicialização caso aconteça algum erro durante o carregamento da página
 function atualizarLoading(argContador=0) {
 	indiceCarregamento+=parseInt(argContador);
 	if (indiceCarregamento==0) {
 		divLoader.style.opacity = 0;
 		divLoader.style.pointerEvents="none";
+		console.log("Carregamento concluído!");
+		funcoesAposLoading.forEach(funcaoAposLoading=>{
+			funcaoAposLoading.apply();
+		});
 	} else {
 		//console.log("LOADING " + indiceCarregamento);
 	}
+}
+//Empilhar funções para execução após o loading completo da aplicação
+function carregarPosLoading(_funcao) {
+	funcoesAposLoading.push(_funcao);
+	console.log("Função carregada");
 }
 function textoLoading(argTexto) {
 	pLoader.innerHTML = argTexto;

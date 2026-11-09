@@ -79,7 +79,7 @@
         "abreviatura": "Trb",
         "pautas": ["F"],
         "transposicao": 0,
-        "imagem":"",
+        "imagem":"🪊",
         "categoria": [
             "Sopros",
             "Bocais",
@@ -107,7 +107,51 @@
         "categoria": [
             "Teclas",
             "Base"
-        ]
+        ],
+		"som": [
+			{
+				"id": "corpo",
+				"multiplicador": 1,
+				"ganho": 0.8,
+				"envelope": {
+					"ataque": 0.005,
+					"decaimento": 0.7,
+					"sustain": 0.25,
+					"release": 0.4
+				},
+				"frames": {
+					"ataque": {
+						"real": [0, 1, 0.55, 0.3, 0.15],
+						"imag": [0, 0, 0, 0, 0]
+					},
+					"sustain": {
+						"real": [0, 1, 0.3, 0.12, 0.04],
+						"imag": [0, 0, 0, 0, 0]
+					}
+				}
+			},
+			{
+				"id": "brilho",
+				"multiplicador": 2,
+				"ganho": 0.2,
+				"envelope": {
+					"ataque": 0.002,
+					"decaimento": 0.25,
+					"sustain": 0.05,
+					"release": 0.2
+				},
+				"frames": {
+					"ataque": {
+						"real": [0, 1, 0.2, 0.08],
+						"imag": [0, 0, 0, 0]
+					},
+					"sustain": {
+						"real": [0, 1, 0.08, 0.02],
+						"imag": [0, 0, 0, 0]
+					}
+				}
+			}
+		]
     },
     {
         "nome": "Violino",

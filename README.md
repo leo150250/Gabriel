@@ -41,10 +41,19 @@ Contudo, caso necessite dele localmente por algum motivo, basta fazer download d
 
 ## ⛏️Feito usando<a name = "feito-usando"></a>
 
-Um computador, um cérebro, temor a Deus e um sonho.
+- HTML
+- CSS
+- JavaScript
+- Um computador
+- Um cérebro
+- Duas mãos humanas
+- Um sonho
+- Temor a Deus
+
+Aliás, orgulhosamente feito por mãos humanas, em época de códigos escrevendo códigos. <3
 
 ## ✍️Autores<a name = "autores"></a>
 
-- [@leo150250](https://github.com/leo150250) - Tudo (até agora rs)
+- [@leo150250](https://github.com/leo150250) - Tudo
 
 Veja também a lista de [contribuidores](https://github.com/leo150250/gabriel/contributors) que participaram deste projeto.

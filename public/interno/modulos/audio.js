@@ -52,6 +52,16 @@ async function carregarModulo_audio() {
 	divPartitura.appendChild(divBarraPlayer);
 	posicionarBarraPlayer(0);
 
+	//Página de edição de áudio de instrumentos
+	let parser = new DOMParser();
+	let paginaEditorAudio = await carregarPagina("./interno/modulos/audio_editor.html");
+	let conteudoEditorAudio = parser.parseFromString(paginaEditorAudio,"text/html");
+	dialogEditorAudio = conteudoEditorAudio.childNodes[0].childNodes[1].childNodes[0];
+	dialogoEditorAudio = new Dialogo("Editor de áudio",null,dialogEditorAudio,abrirEditAudio);
+
+	h2InstrumentoEditorNome = document.getElementById("instrumentoEditorNome");
+	tableListaCamadasEditorAudio = document.getElementById("listaCamadasEditorAudio");
+
 	await navigator.requestMIDIAccess({sysex:true,software:true}).then(onMIDISuccess, onMIDIFailure);
 	playNoteWithMIDISynth(FrequenciasNotas.C, 10, 3, 0.2);
 	await new Promise(r => setTimeout(r, 100));
@@ -65,9 +75,85 @@ async function carregarModulo_audio() {
 	//playNoteWithMIDISynth(FrequenciasNotas.G, 127);
 	//playNoteWithMIDISynth(FrequenciasNotas.A, 127);
 	//playNoteWithMIDISynth(FrequenciasNotas.B, 127);
+	carregarPosLoading(()=>{
+		exibirDialogo(dialogoEditorAudio);
+	});
 	atualizarLoading(-1);
 	return true;
 }
+function abrirEditAudio(_instrumento = null) {
+	if (_instrumento === null) {
+		_instrumento = jsonInstrumentos[8];
+	}
+	console.log(_instrumento);
+	h2InstrumentoEditorNome.innerText = `${_instrumento.nome} (${_instrumento.abreviatura})`;
+	if (_instrumento.som !== undefined) {
+		let headerTabelaCamadas = tableListaCamadasEditorAudio.getElementsByTagName("tr")[0];
+		while (tableListaCamadasEditorAudio.firstChild) {
+			tableListaCamadasEditorAudio.removeChild(tableListaCamadasEditorAudio.firstChild);
+		}
+		tableListaCamadasEditorAudio.appendChild(headerTabelaCamadas);
+		_instrumento.som.forEach(camadaSom=>{
+			let novaLinha = document.createElement("tr");
+			let tdId = document.createElement("td");
+			tdId.innerText = camadaSom.id;
+			let tdMulti = document.createElement("td");
+			tdMulti.innerText = camadaSom.multiplicador;
+			let tdGanho = document.createElement("td");
+			tdGanho.innerText = camadaSom.ganho;
+			let tdAcoes = document.createElement("td");
+			let buttonApagarCamada = document.createElement("button");
+			buttonApagarCamada.innerText = "🗑️";
+			tdAcoes.appendChild(buttonApagarCamada);
+			novaLinha.appendChild(tdId);
+			novaLinha.appendChild(tdMulti);
+			novaLinha.appendChild(tdGanho);
+			novaLinha.appendChild(tdAcoes);
+			tableListaCamadasEditorAudio.appendChild(novaLinha);
+		});
+	}
+	/*
+	//Categorias
+	while (divInstrumentosListagemCategorias.firstChild) {
+		divInstrumentosListagemCategorias.removeChild(divInstrumentosListagemCategorias.firstChild);
+	}
+	while (divInstrumentosListagem.firstChild) {
+		divInstrumentosListagem.removeChild(divInstrumentosListagem.firstChild);
+	}
+	let categorias=[];
+	jsonInstrumentos.forEach(instrumento => {
+		instrumento.categoria.forEach(categoria => {
+			if (!categorias.includes(categoria)) {
+				categorias.push(categoria);
+			}
+		})
+		gerarBotaoInstrumento(instrumento);
+	});
+	categorias.sort();
+	categorias.forEach(categoria=>{
+		let novaCategoria = document.createElement("button");
+		novaCategoria.innerHTML = categoria;
+		novaCategoria.onclick = (e)=>{
+			if (categoriaSelecionada!=null) {
+				categoriaSelecionada.classList.remove("selecionado");
+			}
+			categoriaSelecionada = novaCategoria;
+			categoriaSelecionada.classList.add("selecionado");
+			while (divInstrumentosListagem.firstChild) {
+				divInstrumentosListagem.removeChild(divInstrumentosListagem.firstChild);
+			}
+			jsonInstrumentos.forEach(instrumento => {
+				if (instrumento.categoria.includes(categoria)) {
+					gerarBotaoInstrumento(instrumento);
+				}
+			});
+		}
+		divInstrumentosListagemCategorias.appendChild(novaCategoria);
+	})
+	*/
+	console.log("EditAudio aberto");
+}
+
 function onMIDISuccess(midiAccess) {
 	console.log('MIDI Access Object', midiAccess);
 	MIDI = midiAccess;
