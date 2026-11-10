@@ -1,23 +1,18 @@
 <dialog id="dialogoAudioEditor">
 	<h1>Editor de áudio de instrumento</h1>
-	<h2 id="instrumentoEditorNome">...</h2>
+	<span class="form">
+		<h2 id="instrumentoEditorNome">...</h2>
+		<button onclick="executarSomCamadasEdit()">▶️</button>
+		<button onclick="alternarExecucaoLoopCamadasEdit()">🔁</button>
+	</span>
 	<div class="scroll" style="height: 10rem">
 		<table id="listaCamadasEditorAudio">
 			<tr class="sticky">
+				<th></th>
 				<th>ID</th>
 				<th>Mult.</th>
 				<th>Ganho</th>
 				<th></th>
-			</tr>
-			<tr>
-				<td>Corpo</td>
-				<td>1</td>
-				<td>0.8</td>
-				<td><button>🗑️</button></td>
-			</tr>
-			<tr>
-				<td>1</td>
-				<td>Brilho</td>
 			</tr>
 		</table>
 	</div>
@@ -28,22 +23,34 @@
 			<span class="form"><label>Ganho:</label><input disabled type="number" min="0.00" max="1.00" id="dialogEditorAudio_CamadaGanho"></span>
 		</span>
 		<span class="form">
-			<span class="form"><label>ATK:</label><input disabled type="number" min="0" max="1" id="dialogEditorAudio_EnvATK"></span>
-			<span class="form"><label>DEC:</label><input disabled type="number" min="0" max="1" id="dialogEditorAudio_EnvDEC"></span>
-			<span class="form"><label>SUS:</label><input disabled type="number" min="0" max="1" id="dialogEditorAudio_EnvSUS"></span>
-			<span class="form"><label>REL:</label><input disabled type="number" min="0" max="1" id="dialogEditorAudio_EnvREL"></span>
+			<label><input disabled type="checkbox" id="dialogEditorAudio_CamadaVibrato"> Vibrato</label>
+			<span class="form"><label>Frequência:</label><input disabled type="number" min="0" step="0.1" id="dialogEditorAudio_CamadaVibratoFrequencia"></span>
+			<span class="form"><label>Profundidade (cents):</label><input disabled type="number" min="0" max="100" step="0.1" id="dialogEditorAudio_CamadaVibratoProfundidade"></span>
+			<span class="form"><label>Atraso (s):</label><input disabled type="number" min="0" max="1" step="0.1" id="dialogEditorAudio_CamadaVibratoAtraso"></span>
 		</span>
 		<span class="form">
-			<canvas id="dialogEditorAudio_Env"></canvas>
+			<span class="form"><label>ATK:</label><input disabled type="number" min="0" max="1" step="0.001" id="dialogEditorAudio_EnvATK"></span>
+			<span class="form"><label>DEC:</label><input disabled type="number" min="0" max="1" step="0.001" id="dialogEditorAudio_EnvDEC"></span>
+			<span class="form"><label>SUS:</label><input disabled type="number" min="0" max="1" step="0.001" id="dialogEditorAudio_EnvSUS"></span>
+			<span class="form"><label>REL:</label><input disabled type="number" min="0" max="1" step="0.001" id="dialogEditorAudio_EnvREL"></span>
 		</span>
+		<span class="form">
+			<canvas id="dialogEditorAudio_Env" width="auto"></canvas>
+		</span>
+	</div>
+	<div class="scroll">
 		<table id="listaFramesCamada">
 			<tr class="sticky" id="">
 				<th>Frame</th>
 				<th>0</th>
+				<th>1</th>
+				<th><button>➕</button></th>
 			</tr>
 			<tr>
 				<td>Ataque</td>
 				<td>0</td>
+				<td>1</td>
+				<td></td>
 			</tr>
 		</table>
 	</div>
